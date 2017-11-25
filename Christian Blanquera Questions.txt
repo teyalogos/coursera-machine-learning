@@ -1,0 +1,6 @@
+First we have to show him what I'm capable of.
+Maybe discuss making a neural networking project? Am I good enough, which libraries to use, how to collect the data
+Programming a neural network.
+What else should I learn? Discuss that with him.
+How do I move from here? How do I get into MIT?
+Help on Support Vector Machines

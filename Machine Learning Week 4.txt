@@ -1,0 +1,65 @@
+WEEK 4 OF COURSERA ML BY ANDREW NG:
+
+Note: g() is the sigmoid function.
+
+Model Representation 1:
+
+    a(i)^(j) = Activation unit "i" in layer "j"
+    theta(j) = matrix of weights controlling function mapping from layer j to layer j+1 //This is also called the weight.
+
+    Note: If network has s(j) units in layer j, s(j+1) units in layer j+1 then theta(j) will be dimension s(j+1) x (s(j) + 1)
+
+Model Representation 2:
+
+    We are going to represent the the inputs of a(i)^(j) as g(z(i)^(j)) so
+    
+    a(1)^(2) = g(theta(10)(1)x(0)...) = g(z(1)^(2)) = a(1)^(2) = g(z(1)^(2))
+    a(2)^(2) = g(z(2)^(2))
+    And so on...
+
+    Vectorized Implementation:
+    If you notice, since the z's have their own corresponding weights, inputs and biases,
+    we can also vectorize this. So we can store the z's in their own vector:
+        [z(1)^(2) ... z(i)^(j)]
+    So z^(2) = theta^(1)a(1)
+       a^(2) = g(z^(2))
+    It's so much more simple and easy to calculate, we just smushed all those parameters and what not into some vectors.
+
+Examples and Intuitions 1:
+
+    We can make any logical gate with these neural networks, in this case let's make the AND gate.
+    a(0)^(1) = -30
+    a(1)^(1) = 20
+    a(2)^(1) = 20
+    So the output is G(-30+20x+20x)
+    -30+20+20 = 10 or 1
+    -30+0+20 = -10 or 0
+    -30+20+0 = -10 or 0
+    -30+0+0 =  -30 or 0
+
+Multi Class Classification:
+
+    When classifying multiple objects, instead of having one input, we will have multiple inputs to represent each class.
+    So our y can be [1,0,0,0] when it's a pedestrian, a [0,1,0,0] when it's a car and so on. We basically just a hidden 
+    layer with multiple inputs as the output.
+    
+Neural Network Process:
+
+    The neural network has 3 types of layers,
+    the input layer, the hidden layer(s) and the output layer.
+
+    Each layer has neurons that calculate probabilities based on their weights, biases and previous neurons.
+    
+    Forward Propagation:
+    1. First, we input the values into our input layer
+    2. The input layer passes it's values into the hidden layer.
+    3. The hidden layer calculates it's inputs with it's bias and weight
+    4. The hidden layer outputs a probability or it's activation and passes this on to the output layer 
+    5. The output layer then calculates a probability with it's inputs, bias and weight.
+       The highest activation neuron is the guess that the network is taking.
+       Note: The output layer is just a hidden layer but the last one.
+
+    Backpropagation:
+    1. We calculate the cost of the Neural Network via it's output (We use the testing process's outputs)
+    2. From this we use back propagate, adjusting each neuron's weights and bias based on it's cost for optimization
+    3. We keep repeating this process until satisfied

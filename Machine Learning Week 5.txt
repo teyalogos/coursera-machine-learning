@@ -1,0 +1,334 @@
+WEEK 5 OF COURSERA ML BY ANDREW NG:
+
+WHAT THE HELL IS A PARTIAL DERIVATIVE?:
+
+	"Recall that our derivative is the slope of a line tangent to the cost function, so the steeper the slope the more incorrect we are."
+	Remember, we have a derivative for EACH theta variable
+	The partial derivative is used by the optimization algorithm as a reference. Remember, it's a slope.
+
+	We can use the optimization algorithm without the partial derivative.
+	However, it will not optimize. We derive the partial derivative from 
+	the cost function so we know how much we should go down for the 
+	optimization algorithm.
+	
+Cost Function:
+    
+    Notation:
+    L - number of layers
+    S(l) - number of units (not including the bias unit) in layer l
+    K - number of units in output layer
+
+    Binary Classification: 1 output unit
+    Multi-class Classification: K output units
+
+    Our cost function will basically be a generalization of the logistic regression cost function
+    but instead of one logistic regression output unit, we have K of them.
+
+    We notate the amount of outputs with (h(x))(i) where h(x) is the ith output
+
+    The Summations:
+    The first summation, the K summation will loop over the Kth element and sum the terms together.
+    This is like the summation in the original logistic regression cost function but for Kth elements
+
+    The last summation terms will sum together the theta values of (i, j, l) for regularization.
+    But we don't sum the bias values much like the original logistic regression cost function
+
+    N0TE:
+
+    -the double sum simply adds up the logistic regression costs calculated for each cell in the output layer
+    -the triple sum simply adds up the squares of all the individual Θs in the entire network.
+    -the i in the triple sum does not refer to training example i
+
+Backpropagation:
+
+    We need to compute J(theta) and the partial derivative. Since the cost function is J(theta), we will
+    be discussing on calculating the partial derivative.
+
+    The term backpropagation is coined because we calculate the last layer's delta first then move backwards.
+
+    We calculate all of this to get the partial derivative which is used by the optimization algorithm.
+
+
+    The DELTA term calculates the "error" for it's corresponding layer and node so that the previous layer 
+    has a reference on what to change. It's a bit like the cost for each node. (The cost of the network is the cost
+    of the ENTIRE network)
+
+    The DELTA term:
+        Computing the delta term in the output layer:
+        delta(j)^(l) = "error" of node j in layer l
+        delta(j)^(l) = a(j)^(l) - y(j)
+        DELTA l is equal to A l minus Y
+        Computing the delta term backwards, from before the output layer (NOTE: This is a vectorized implementation):
+        delta(3) = (theta(3))' * delta(4) .* g(z(3))
+        delta(2) = (theta(2))' * delta(3) .* g(z(2))
+        DELTA three is equal to THETA three tranpose times DELTA four element wise multiplicated by G of Z three
+        NOTE: We calculate g(z(l)) like a(l) .* (1-a(3)). This is basically g primed.
+        NOTE: There is no delta(1) because that's the input layer, we don't really want to change the features.
+
+    The CAPITAL DELTA term:
+        NOTE: Before backprop, set all DELTAs as 0 for it's corresponding layer and node
+        NOTE: Vectorized, just calculate the DELTAs as a matrix for their corresponding layer
+        The capital delta terms will act like accumulators to slowly add things together to compute the partial derivative.
+        
+
+    We can get the partial derivative by calculating the delta terms and the activation functions together.
+    However, it is a fairly complicated proof so we can't explain that yet.
+    (partial_derivative)J(theta) = a(l) * delta(l+1)
+
+
+    Given one training example:
+    (x, y) is our single training example, let's step through the series of calculation.
+    
+    - Set a(1) to x(i)
+    - Forward Propagation
+        a(1) = x 
+        z(2) = theta(1)a(1)
+        a(2) = g(z(2)) 
+        z(3) = theta(2)a(2)
+        a(3) = g(z(3))
+        ...
+    - Backpropagation on output layer
+        delta(l) = a(l) - y
+        ...
+    - Backpropagation on hidden layers
+        delta(3) = (theta(3))' * delta(4) .* a(l) .* (1-a(l)
+        delta(2) = (theta(2))' * delta(3) .* a(l) .* (1-a(l)
+        NOTE: There is no delta(1) because that's the input layer, we don't want to change the features.
+    - We then compute the CAPITAL DELTA terms to compute the partial derivative
+        DELTA(l) := DELTA(l) + a(l) * delta(l + 1)
+    - We then calculate CAPITAL D which is the partial derivative
+        D(l) := (1/m) * DELTA(l) + (regularization_term)    if node != 0
+        D(l) := (1/m) * DELTA(l)                            if node == 0
+    - We can than use this partial derivative term to use in gradient descent or any other optimization algorithm
+
+    We backpropagate because we want to change the activations and weights based on the last layer's
+    "error", this is like calculating the cost. We wan't to change each layer and node so that it answers correctly. Each layer's
+    reference is the layer after it. The values we pass on are the delta terms, the delta terms is the error of the current layer.
+    It's a bit like the cost. We add up all these delta terms into the CAPITAL DELTA term so we have the entire network's cost.
+    Then calculate the CAPITAL DELTA term into the CAPITAL D term to get the partial derivative. //NOT SO SURE ABOUT THIS YET
+
+    The DELTA TERM is like the COST of the CURRENT LAYER. The previous layer will use this COST or in this case we call it the ERROR 
+    for optimization. This is just like using the COST in logistic regression but for multiple NODES.
+	
+
+Backpropagation Intuition:
+	
+	The delta terms are how much we want to change the weights of the activation function.
+	The delta terms are actually the derivative of the cost function.
+	
+	
+Backpropagation in Practice:
+
+	####################
+	Unrolling Parameters:
+	#####################
+	
+		Since our parameters are no longer vectors, they are matrices now,
+		we need to find a way to feed them into our optimization function as vectors.
+		We "unroll" the matrices into a single vectors so that they're in a format suitable
+		to pass in to our optimization function.
+		
+		Example:
+			s1, s2 = 10 and s3 = 1 (this is the output)
+			Theta1, Theta2 = 10*11 and Theta3 = 1*11
+			D1, D2 = 10*11 and D3 = 1*11
+		
+		If we want to convert these matrices into vectors, in Octave, we can do this:
+			thetaVec = [ Theta1(:); Theta2(:); Theta3(:) ]
+			DVec = [ D1(:); D2(:); D3(:) ]
+		
+		If we want to convert these vectors back into matrices:
+			Theta1 = reshape(thetaVec(1:110), 10, 11);
+			Theta2 = reshape(thetaVec(111:220), 10, 11);
+			Theta3 = reshape(thetaVec(221:231), 1, 11);
+		
+		- Have Initial Parameters
+		- Unroll to get initialTheta to pass to the optimization function
+		- From thetaVec, get the parameters again
+		- Use forward prop/back prop to compute D and J(theta)
+		- Unroll D to get gradientVec
+		
+		Matrices: We use matrices for forward prop/back prop
+		Vectors: We use vectors for the optimization function since they assume your parameters are unrolled into a vector
+	
+	##################
+	Gradient Checking:
+	##################
+	
+		Unfortunately, backprop is kinda buggy. The implementation might look like it's working but
+		there are subtle bugs that are causing major problems. There is this idea called "Gradient Checking"
+		that eliminates almost all of these problems
+		
+		NOTE: The derivative is the slope of the tangent line in the cost function
+		NOTE: If we make the epsilon really really small, mathematically, it's basically the same as the derivative
+		NOTE: We don't set epsilon to too small because it will cause numerical problems
+		NOTE: There is a similar equation like the one shown underneath, that one is called the "one sided difference"
+			  The one we use is the "two sided difference" which is more accurate.
+		
+		We approximate the derivative by plotting a very close and similar line like the derivative, but this time the values are
+		altered with "epsilon". Epsilon is normally set to a very small number like 10^-4
+		
+		derivative(J(theta)) roughly = (J(theta - epsilon) - J(theta + epsilon))/2(epsilon)
+		
+		Octave Implementation:
+			gradApprox = (J(theta + EPSILON) - J(theta - EPSILON))/(2*EPSILON)
+	
+		Octave implementation of numerically computing the derivatives of their respective theta:
+			for i = 1:n,
+				thetaPlus = theta;
+				thetaPlus(i) = thetaPlus(i) + EPSILON;
+				thetaMinus = theta;
+				thetaMinus(i) = thetaMinus(i) + EPSILON;
+				gradApprox(i) = (J(thetaPlus) - J(thetaMinus))/(2*EPSILON)
+			end;
+			
+			We then compare gradApprox with DVec (DVec is the vector of the derivatives we got from backprop)
+			(If the answer is very similar, or the same, we're confident our implementation of backprop is correct)
+			
+		Implementation Note:
+			- Implement backprop to compute DVec (Unrolled)
+			- Implement numerical gradient checking to compute gradApprox
+			- Make sure they give similar values
+			- Turn off gradient checking. Use backprop code for learning.
+			Important: Be sure to disable gradient checking before training your classifier.
+				
+				
+	####################
+	Random Initializion:
+	####################
+		
+		When we're running gradient descent or the advanced optimization algorithms,
+		we need to choose an initial value for the parameters theta. 
+		
+		We can't just set the values to 0, theta and delta won't change at all.
+		Adding to this, after each update, parameters corresponding to inputs going 
+		into each of two hidden units are identical.
+		
+		We use random initialization instead, we can't have all of our weights the same
+		so we randomly initialize all the theta values.
+		
+		Initialize theta to a random value [-epsilon, epsilon]
+		
+		Octave Implementation:
+			If the dimensions of Theta1 is 10x11, Theta2 is 10x11 and Theta3 is 1x11.
+
+			Theta1 = rand(10,11) * (2 * INIT_EPSILON) - INIT_EPSILON;
+			Theta2 = rand(10,11) * (2 * INIT_EPSILON) - INIT_EPSILON;
+			Theta3 = rand(1,11) * (2 * INIT_EPSILON) - INIT_EPSILON;
+			
+		NOTE: This is not the same epsilon as in gradient checking
+		NOTE: The point of this is to break symmetry! Our weights cannot all be the same.
+		
+	####################
+	Putting it Together:
+	####################
+	
+		- Pick a network architecture
+			No. of input units
+			No. of output units: Number of classes (K)
+			Reasonable default: 1 hidden layer, or if >1 hidden layer, have some no. of
+			hidden units in every layer (Usually the more, the better but more computationally expensive)
+		
+		Training a Neural Network:
+			1. Randomly Initialize Weights
+			2. Implement Forward-prop to get h(x) for any x
+			3. Implement code to compute cost function J(theta)
+			4. Implement Backward-prop to compute the partial derivatives
+			
+			for i = 1:m{
+				Perform forwardprop and backprop for using example (x(i), y(i))
+				(Get activations a(l) and delta terms (l) for l = 2...L)
+				Calculate capital delta terms; DELTA(l) = DELTA(l) + delta(l+1) * ((a(l)))-transposes
+			}
+			Compute partial derivative terms with lambda (regularization term)...
+			
+			5. Use gradient checking to compare the partial derivative computed using backprop vs. using
+			   numerical estimate of gradient of J(theta)
+			   Then disable gradient checking code 
+			6. Use gradient descent or advanced optimization method with backprop to try to minimize J(theta)
+			   as a function of parameters theta
+			
+			NOTE: J(theta) is non-convex so gradient descent or the advanced optimization algorithms might get stuck
+			      at a local optima.
+			NOTE: There are advanced vectorization methods to do all of this without the for-loop,
+			      but for the first time we do it, we use a for-loop as the vectorization method is too advanced
+				  for us.
+
+
+CODE REVIEW:
+
+	We do not pass on the values Theta1 and Theta2.
+	I thought we should of because of the previous code.
+	REMEMBER! WE ARE SUPPOSED TO PASS ON OUR HYPOTHESIS!
+	!!NOT!! OUR THETA VALUES!!
+	
+	Getting the Cost:
+		Alright, so for some reason my implementation does not give me the correct values.
+		It's a bit off.
+		I have tested my implementation of forward propagation and my cost function and they
+		are both the culprits. I will try reviewing the way I stitched them together
+		
+		LMAO WHAT THE FUCK THE THING THAT WAS WRONG WAS MY IMPLEMENTATION OF THE Y MATRIX
+		I'm supposed to do something with the original Y vector?
+		Yes, I'm stupid. The Y vector is OBVIOUSLY our labels, I knew that.
+		But "genius" me thought all of the labels were one-hot 10
+		so I just made a 5000x10 zeros matrix with 1 at the end of each row.
+		
+		These new expressions:
+			y = sparse(1:numel(y), y,1);
+			or
+			y = eye(max(y))(y,:);
+		allow us to make a one hot matrix with the corresponding y labels.
+		
+	Implementing Backpropagation:
+		Accessing the training data:
+			Remember, we don't just access one element.
+			We access a whole range of elements for each input.
+			In this case, our training examples are a 20x20 pixel image,
+			this makes 400 elements for each example.
+			Each example is stored in each row of the 5000x400 X matrix.
+			
+			We need to retrieve the 400 elements of each row and store it inside
+			the a1 variable along with the bias unit.
+			
+			NOTE: ; Separates columns into rows
+		
+		IM DOING VECTORIZED IMPLEMENTATION NALANG IT'S EASIER.
+		
+		delta3 = h - y;
+		delta2 = (delta3*Theta2) .* sigmoidGradient([ones(m,1) z2]);
+		DELTA1 = DELTA1 + (delta2' * a1);
+		DELTA2 = DELTA2 + (delta3' * a2);
+		
+		delta2's dimensions are 5000x26
+		and a2's dimensions are 5000x401
+		They cannot multiply, however delta2 transpose's dimesions are
+		26x5000
+		and a2's dimensions are 5000x401
+		BUT THEY CAN MULTIPLY!??!
+		
+		Octave's documentation on the * operand is:
+		Matrix multiplication. The number of columns of x must agree with the number of rows of y, or they must be broadcastable to the same shape. 
+		
+		DAMN!!!!
+		
+		I need to read the documentation!
+		
+		IMPLEMENTING BIG D:
+			NOTE: BIG D IS NOT A SINGLE VARIABLE EACH THETA GRAD HAS IT'S OWN BIG D.
+			WE CALCULATE EACH BIG D
+			
+		
+	THERE IS SOMETHING WRONG WITH MY IMPLEMENTATION OF THE COST FUNCTION AND 
+	REGULARIZATION!!
+	I DIDN'T PUT THE DOUBLE SUM!!! DAMNN!!!
+	I FORGOT ABOUT THIS TERM (:,2:end) AT THE END OF delta2!!!
+	WE NEEDED TO REMOVE THE BIAS UNIT!!!
+	
+	Implementing Regularized Backpropagation:				
+		Theta1_grad(:, 2:end) += (lambda/m) * Theta1(:,2:end); #big D 1
+		Theta2_grad(:, 2:end) += (lambda/m) * Theta2(:,2:end); #big D 2
+		
+		Remember, we are only accessing the non-bias terms with (:,2:end)
+		because those are the only terms we want to regularize.
+		We do this at the end of backprop.

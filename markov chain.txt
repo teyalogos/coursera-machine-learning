@@ -1,0 +1,71 @@
+Markov Chain Explanation:
+A Markov Chain is a network of states and probabilities.
+For each state, there is a possibility it might transition into another state or into itself again.
+For example, Ellie has three states, self-existential, being gayer and eating. There is a range of posibilities
+coming from the perspective of each state. For example, if Ellie was eating, there is a higher possibility 
+she might have an existential crisis, for now let's say it's a 70% chance, a 20% chance for being gay and a 10% chance 
+she might start eating again. We have those probabilities for EACH state.
+
+We can use these concepts for a range of things. For example, sentence simulators.
+We're gonna get the probability that a certain word is at the beginning, then the probability of the next word based 
+on the previous word, then this keeps on going until the program decides to end the sentence.
+A good example of this is autocorrect, it learns which word you're gonna type next (but only if you specify the words you use though).
+
+
+http://setosa.io/ev/markov-chains/ - Great Visualization of Markov Chains
+
+
+In probability theory, we can notate the probabilities between states in a table (Check the link above, I can't do it here) like this:
+(This is only from the perspective of the state "eating")
+
+P(eating|eating) = 0.10
+P(eating|existential) = 0.70
+P(eating|gay) = 0.20
+
+
+
+
+
+Neural Network Explanation:
+At first I want to discuss, how does a program learn? What are the steps? (Let's not get into the maths first!)
+I will be explaining "supervised" learning, which is basically just learning from reference. You learn what you got right
+and what you got wrong, and from there you can improve. That's basically what machines do with supervised learning.
+But let's break down the steps so it's easier to grasp.
+
+
+Step One! 
+We give the machine a dataset, this dataset is comprised of data we will train with and test with (To make sure it
+actually learns! We don't want to make a lookup table). For now, let's assume the machine is going to classify whether something
+is an orange or an apple. We will give it a dataset comprised of the "features" of apples and oranges. As an example, let's use bumpy-ness as a 
+feature. In the dataset, each set of features correspond with it's label, in this case it's either an apple or an orange. 
+(This is called a binary classifier, 0 or 1, we have 2 classes)
+
+Example:
+
+    bumpy_level = 50	  #this is a feature
+    label = 1      		  #this is the label, in this case it's a 1 which is meant to notate an orance
+						  #we wan't the label to be a value so the machine can do calculations with it
+    bumpy_level = -10
+    label = 0			  #apple = 0, orange = 1
+
+As you can see, the oranges are clearly more bumpy than the apples with a "bumpy_level" of 50 compared to a bumpy_level of -10. 
+The machine can learn the characteristics for a certain class, much like a human. 
+We need to supply it with a "label" (the answer key) so it knows whether it's right or wrong.
+
+Note: When we make datasets, we split it in two parts. The training and testing parts. Just imagine a textbook and a test.
+
+Step Two! 
+Alright, so we have our data. We just fed it to the machine, what is it gonna do with the data?
+The machine will run the data through it's "hypothesis" function. This is it's method to guessing. Based on the data given,
+the hypothesis function will calculate it's guess (I will not go into the mathematics for now!). So the machine decided,
+but it's guess isn't very good. Let's say we gave it an example of a bumpy_level of 55, this is supposed to be an orange, but the
+machine guesses it's an apple with 54% certainty. Hmmm, we need to find a way to tell the machine how well it did, in this case, not very,
+it needs a lot of improving. We are dealing with an untrained classifier, it's hypothesis function is just randomly guessing.
+
+Step Three! 
+So we need a way to tell the machine how well it did. The function we use for this is called the "cost function"
+it calculates how well the machine did based on it's answer and the actual answer then outputs a "cost"
+which is just how well the program did. However, we can't just tell the machine how well it did and expect it to learn! We need a way to optimize itself.
+
+Step Four!
+The optimization function.

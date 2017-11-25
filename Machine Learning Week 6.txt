@@ -1,0 +1,531 @@
+Week 6 of Machine Learning:
+
+Nikhos told me
+For AI, we need matrix theory, graph theory, automata theory, discrete math
+
+Very often, we can brainstorm different ways to improve our model.
+
+Deciding What to Try Next:
+	
+	Debugging a learning algorithm:
+		
+		Preventing bad predictions:
+			- Get more training examples
+			- Try a smaller set of features
+			- Try getting more features
+			- Try adding polynomial features
+			- Try decreasing/increasing lamda
+			
+			Do not go by gut feeling!
+			We're gonna learn which ones to use
+		Machine Learning Diagnostics:
+			Diagnostic: A test that you can run to gain insight
+			what is/isn't working with a learning algorithm, 
+			and gain guidance as to how best to improve it's performance.
+			
+			Diagostics can take time to implement, but doing so is a great use of time.
+	
+	
+Evaluating a Hypothesis:
+	
+	Evaluating and understanding our hypothesis is a good start to diagnose our learning algorithm.
+	
+	Just because a hypothesis has low training error, doesn't mean it's a good hypothesis.
+	We already know that it can overfit. So how do we tell how to hypothesis is overfitting?
+	
+	We test our hypothesis on data it's never trained on before. 
+	We split our dataset into two parts, the training data and the testing data.
+	(The testing data portion is always smaller than the training data portion; 70% train, 30% test)
+	We should randomly reorder/shuffle our training set before setting our portions.
+
+	Train/test learning algorithm: We basically just use the training portion mtest instead of mtrain or m
+		- Learn parameter theta from training data
+		- Compute test error: Jtest(theta) = 1/2m_test...
+			Compute the squared error
+		- If it's a classification problem: Misclassification error (0/1 misclassification error):
+			Basically, we either give a 0 or a 1 if it get's it right or wrong.
+			err(h, y) = 
+			{
+				if(h > >= 0.5) y=0
+				else y=1
+			}
+			
+			Test Error: (1/mtest) * sum(err(h, y))
+		
+			}
+			
+Moden Selection and Train/Validation/Test Sets:
+
+	Here, we evaluate which model is the best to use.
+	We use the training set for training, the validation set
+	for to tune our different models and the testing set to 
+	fully evaluate how our model did.
+
+	Let's choose what degree of polynomials to use for our model.
+		1. Linear d=1
+		2. Quadratic d=2
+		3. Cubic d=3 
+		...
+		10. 10th order d=10
+		d = what degree of polynomial we want to pick
+		
+	So we chose the 5th order polynomial, how well does this model generalize?
+	First we can use it on the test set, but this is not a fair estimate 
+	for how our hypothesis generalizes.
+		
+	Since we fit this model to the test set, this is not a fair test.
+	We need to use another set to test the new model.
+
+	We use the model on our cross validation set or just validation set.
+	We pick the model that does the best on the cross validation set.
+		
+	A good summary of the difference of the training set, testing set and the validation set is:
+		
+		Training set: a set of examples used for learning: to fit the parameters of the classifier 
+		In the MLP case, we would use the training set to find the “optimal” weights with the back-prop rule
+		
+		Validation set: a set of examples used to tune the parameters of a classifier In the MLP case, we would 
+		use the validation set to find the “optimal” number of hidden units or determine a stopping point for the back-propagation 
+		algorithm
+			
+		Test set: a set of examples used only to assess the performance of a fully-trained classifier In the MLP case, we would
+		use the test to estimate the error rate after we have chosen the final model (MLP size and actual weights) After 
+		assessing the final model on the test set, YOU MUST NOT tune the model any further!
+		
+		Why separate test and validation sets? The error rate estimate of the final model on validation data will be biased 
+		(smaller than the true error rate) since the validation set is used to select the final model After assessing the final 
+		model on the test set, YOU MUST NOT tune the model any further!		
+	
+	
+	Good Proportions for TRAIN/TEST/VALIDATION:	
+	TRAIN/TEST/VALIDATION
+	60/20/20
+	50/25/25
+	
+	Our process:
+		1. Optimize the parameters theta using the training set for each polynomial degree/model
+		2. Find the polynomial degree d with the least error on the validation set
+		3. Estimate the generalization error using the test set with Jtest(theta(d)) (d = theta from the polynomial with the least error)
+		
+		
+Diagnosing Bias vs Variance:
+	
+	If we're running a learning algorithm and it isn't doing as well as expected,
+	almost all the time it's a high bias or a high variance problem.
+	In other words, it's either underfitting or overfitting.
+	
+	It's very
+	important to figure out
+	which of these two problems is
+	bias or variance or a bit of both that you
+	actually have.
+	Because knowing which of these
+	two things is happening would give
+	a very strong indicator for whether
+	the useful and promising ways
+	to try to improve your algorithm.
+ 
+	Training Set:
+	With a low degree of polynomials, we are going to underfitting and our error will be high
+	With a high degree of polynomials, we are going to underfit and our error might even be 0
+	
+	Cross Validation Set:
+	So if D = 1, we are gonna have a very high cross validation error because it is underfitting
+	If we fit an intermediate degree of polynomial, it will also have a high error unlike in
+	the training set we're we got a low error. We're underfitting here.
+	
+	But if we use the D value that's "just right", in this example we use D = 2.
+	Our training error and our cross validation error are both going to be low.
+	
+	High Bias:
+		j_train(theta) = high
+		j_cv(theta) = high
+	High Variance:
+		j_train(theta) = low
+		j_cv(theta) >> j_train(theta)
+		j_cv(theta) = high
+		
+Regularization in Bias/Variance:
+	
+	Here we will discuss what regularization does to the bias and variance of our learning algorithm.
+	Remember, to prevent overfitting, we use regularization. 
+	
+	Large Lambda: Underfit
+	Intermediate Lambda: "Just Right"
+	Small Lambda: Overfit
+	
+	Choosing The Regularization Values:
+		NOTE: Step on multiples of 2 
+		
+		We list down our variations of lambda:
+		1. 0.00
+		2. 0.01
+		3. 0.02
+		4. 0.04
+		...
+		12. 10 
+		
+		Then we minimize theta with them. (We use our normal cost function with lambda)
+		We then test the calculated theta parameters on our cross-validation set
+		
+		1. theta(0)
+		2. theta(1)
+		3. theta(2)
+		4. theta(4)
+		...
+		12. theta(10)
+		
+		Then we pick the model that has the least error on the cross-validation set
+		Finally, we get our selected parameter theta and test it on the test set.
+		Pick (say) theta(5) Test error: J_test(theta(5))
+		
+	Different Models and their affect on our cost functions:
+		J_train:
+			Low Lambda: Overfitting, thus a low error on the training set
+			High Lambda: Underfitting, thus a high error on the training set
+		J_cv:
+			Low Lambda: Overfitting
+			High Lambda: Underfitting
+			Intermediate Lambda: "Just Right"
+			Thus, it creates a convex shape if we graph
+			the error as y and the lambda as x
+		Intermediate Lambda:
+		
+	Create a list of lambdas (i.e. lamda={0,0.01,0.02,0.04,0.08,0.16,0.32,0.64,1.28,2.56,5.12,10.24});
+    Create a set of models with different degrees or any other variants.
+    Iterate through the lamdass and for each lamdas go through all the models to learn some theta.
+    Compute the cross validation error using the learned lambda (computed with lambda) on the J_cv(theta) without regularization or lamda = 0.
+    Select the best combo that produces the lowest error on the cross validation set.
+    Using the best combo theta and lambda, apply it on J_test(theta) to see if it has a good generalization of the problem.
+	
+Learning Curves:
+
+	Learning curves are often very useful things to plot, we can check
+	if our algorithm is working properly, if we have a bias or a variance problem and more.
+	
+	J_train:
+	If the training size is small (m)
+	Then our error is also gonna be small
+		But as our training set gets larger, it
+		gets harder to find a quadratic function that 
+		will fit our data perfectly.		
+	So as training size grows,
+	so does the error.
+	
+	However; in the case of us using J_cv:
+	If the training size is small, our error is larger
+	If the training size is larger, our error gets smaller
+	
+Deciding What to Do Next 2:
+
+	Suppose you have implemented regularized linear regression to predict housing prices.
+	However, when you test your Hypothesis in a new set of houses, you find it makes 
+	unacceptably large errors in it's prediciton. What should you try next?
+	- Get more training examples
+		This fixes high variance
+		However this does not fix high bias
+	- Try smaller set of features
+		Fixes high variance
+	- Try getting additional features
+		Fixes high bias
+	- Try adding polynomial features
+		Fixes high bias
+	- Try decreasing lambda
+		Fixes high bias
+	- Try increasing lambda
+		Fixes high variance
+		
+	Small Neural Networks are more prone to underfitting
+	Large Neural Networks are more prone to overfitting and more computationally expensive
+	(Use regularization to address overfitting)
+	
+	Using a single hidden layer is a good starting default. You can train your neural network 
+	on a number of hidden layers using your cross validation set. You can then select the one that performs best. 
+	
+	Model Complexity Effects:
+		Lower-order polynomials (low model complexity) have high bias and low variance. In this case, the model fits poorly consistently.
+		Higher-order polynomials (high model complexity) fit the training data extremely well and the test data extremely poorly. These have low bias on the training data, but very high variance.
+		In reality, we would want to choose a model somewhere in between, that can generalize well but also fits the data reasonably well.
+
+IMPLEMENTATION NOTES:
+	
+	Our process:
+		- Implement Regularized Linear Regression
+		- Test the model
+		- Plot the model's learning curve, here we diagnose if it's a high bias (underfitting) or a high variance (overfitting) problem.
+
+	Our questions:
+		- What is Xval and yval?
+			The training examples for the cross validation set
+
+	Regularized Linear Regression:
+		DON'T FORGET ABOUT THE TRANPOSE OPERATOR! Tranposing a matrix/vector can allow it to be multiplied by other matrices/vectors
+		The gradient is screwed up.
+		
+		This implementation is screwed up, I don't thing I'm multiplying the X term well
+		grad = (1/m) * (h - y)*X' + reg_grad;
+		This however works
+		grad = (1/m) * X'*(h - y) + reg_grad;
+		
+		It only works if X is the first operand and is tranposed
+
+	Learning Curve:
+	Remember, the learning curve is a plot of our error over the amount of training examples we have.
+	We can diagnose a high bias/variance problem with this.
+	
+	#Loop over training the number of training examples
+	for i = 1:m 
+		#The training set, it increases as i increases
+		X_train = X(1:i,:);
+		y_train = y(1:i);
+		
+		#Get theta for our cost function
+		theta = trainLinearReg(X_train, y_train, lambda);	
+		
+		#Store our errors for the training set and the cross validation set (Xval/yval)
+		error_train(i) = linearRegCostFunction(X_train, y_train, theta, 0);
+		error_val(i) = linearRegCostFunction(Xval, yval, theta, 0);
+	end
+
+
+	Polynomial Regression:
+		"We obtain a linear regression model where the features are the various powers of the original value (waterLevel)"
+		We will add more features using the higher powers of the existing feature x in the dataset.
+
+		X_poly should be m*p
+		X_poly(:,i) Gets the ith column
+		X_poly(i,:) Gets the ith row
+		So
+		X(1,:) Gets the first column
+		X(:,1) Gets the first row
+
+		Our goal is to get more features from the original X.
+
+		for i=1:p #Loop through the amount of polynomial features
+		#Set our m*1 features matrix X to the ith power.
+		#Set X_poly's ith column to X to the ith power.	
+		#Where i loops over the amount of polynomials we want
+		X_poly(:,i) = X(:,1).^i; 
+		end
+
+	Learning Polynomial Regression:
+		After implementing polynomial regression, the script will proceed 
+		to train polynomial regression using our cost function.
+		Even though we have polynomial terms in our feature vector, 
+		we are still solving a linear regression optimization problem.
+		The polynomial terms have simply turned into features that we can 
+		use for linear regression.
+
+		It turns out that our features actually scale badly as our training set 
+		grows, the script uses feature normalization for this problem.
+
+		If we now observe the learning curve, we can see that we're actually 
+		overfitting. In order to combat this problem, we can use regularization.
+		In the next exercise, we will be try out different lambda parameters
+		to see how regularization can lead to a better model.
+		
+
+
+
+
+
+Building a Spam Classifier:
+
+	Prioritizing what to work on:
+		We'll use spam classifying as an example,
+		Spam = 1 
+		Not-Spam = 0
+		X = features of the email
+
+		With supervised learning:
+			We will make a logistic regression classifier,
+			Maybe our X will be 100 words indicative of spam.
+			E.G deal, buy, now, discount...
+			From this, we can encode this into a feature vector. (R = 100)
+
+			Note: In practice, take most frequently occuring n words (10k - 50k)
+			in training set, rather than manually picking 100 words
+
+			How to spend our time to make it have a low error?
+				- Collect lots of data
+					E.G Honeypot project.
+				- Develop more sophisticated features based on email routing information (from email header)
+				- Develop more sophisticated features from the email body, e.g should "discount" and "discounts"
+					be treated the same way? How about "deal" and "dealer"? Features about puncuation?
+				- Develop sophisticated algorithm to detect misspellings (e.g w4tches, m0rtage, de4l)
+
+				Very often, we can brainstorm different things to try like these.
+				It's very important to think about what to do next. How to improve our model and such.
+				
+				*big Andrew Ng smile* Unfortunately, a lot of research groups choose these options randomly.
+				As if they just woke up one day and started working on one of these options from gut feeling.
+
+				If we prioritize what to improve and what to work on next, we're probably already 
+				ahead of the curve.
+
+			It's difficult to tell which one of these options would help us.
+	
+	Error Analysis:
+
+		Recommended Approach:
+			- Start with a simple algorithm that you can implement quickly.
+				Implement it and test it on your cross-validation set.
+				Atleast spend one day to get something really quick and dirty that we can
+				improve on
+			- Plot learning curves to decide if more data, more features, etc are likely to help
+			- Error Analysis: Manually examine the examples (in cross validation set)
+			  that your algorithm made errors on. See if you spot any systematic trend in what type 
+			  of examples it is making errors on.
+
+			Let evidence guide our decisions on where to spend our time rather than gut feeling.
+			Prevent premature-optimization
+
+		Example:
+			Let's say we have 500 examples in the cross validation set.
+			The algorithm misclassifies 100 examples.
+			Manually examine these 100 examples, and categorize them based on:
+				- What type of email it is
+				- What cues (features) you think would have helped the algorithm classify them correctly.
+
+		The Importance of Numerical Evaluation:
+			It's incredibly useful to have a way to evaluate how well our algorithm is doing.
+			A real numerical value is very helpful. This can be the accuracy or the error.
+
+			Example:
+				Should discount/discounts/discounted be treated as the same word?
+				Maybe we can improve the classifier's accuracy if we did?
+				We can use stemming software such as "Porter Stemmer"
+				We can implement a stemmer to treat all these words the same.
+				This can hurt or do well, if we had a way to quickly see if it works 
+				is through our numerical evaluation.
+
+				Without stemming: 5% error 
+				With stemming: 3% error
+
+				Since with stemming, the error is lower, we can conclude that stemming is helpful.
+
+
+
+
+Handling Skewed Data:
+
+	Let's say we're classifying diagnoses for cancer patients. (y=1 if cancer, else 0)
+	Find that we got 1% error on our training set.
+
+	However, it turns out only 0.50% of the patients had cancer so this value doesn't look that impressive anymore.
+	
+	This is a case where we have messed up proportions for our classes. 
+
+	We would actually do better with this algorithm:
+	function y = predictCancer(x)
+		y = 0 %ignore x!
+	return
+	As this will give us an error of 0.5% if we keep guessing 0.
+
+	If we have very skewed classes, it becomes much harder to just use classification acccuracy,
+	because you can get very high classification accuracy. It's not really clear if we're actually 
+	improving the quality of our classifier. Predicting y = 0 all the time doesn't sound like a good classifier
+	but because of the skewed data, it gives us high accuracy
+
+	We need to find another evaluation metric.
+
+	Precesion Recall:
+		y = 1 in prescense of rare class that we want to detect.
+
+		If the prediction is 1 and the actual is 1, this is called a true positive
+		If the prediction is 0 and the actual is 0, this is called a true negative
+		If the prediction is 1 and the actual is 0, this is called a false positive
+		If the prediction is 0 and the actual is 1, this is called a false negative
+
+		We're gonna compute 2 numbers
+
+		Precision:
+			(Of all the patients where we predicted y=1, what fraction actually has cancer?)
+			Number of true positives / #predicted positive
+			or
+			True pos / True pos + False pos
+			
+			High precision is good
+			What fraction of the patients we predicted actually have cancer?
+		Recall:
+			(Of all the patients that actually have caner, what fraction did we correctly detect as having cancer?)
+			True pos (the ones we correctly predicted) / #actual positives
+			or 
+			True pos / True pos + False neg
+
+			High recall is good
+			What fraction of the cancer patients did we correctly flag?
+
+		If we have a classifier that always predicts 0, it's going to give us a recall of 0
+
+	If we use precision/recall, this will prevent skewed classes from messing up our accuracy.
+	If our algorithm has high recall and precision, we can be confident that our model is doing well.
+
+	
+	
+	
+	
+	
+	
+	Trading off precision and recall:
+
+		Precesion/Recall = evaluation metric for skewed classes
+		In some applications, we need to manage the trade off between precision and recall.
+
+		With a regular classification hypothesis:
+			- Logistic regression: 0 < h(x) < 1
+			- Predict 1 if h(x) >= 0.5
+			- Predict 0 if h(x) < 0.5
+
+		However, in a cancer classification application, we need to be confident that the patient has cancer.
+		We can modify the "predict 1 if ..." value in this case so 
+			- Predict 1 if h(x) >= 0.7
+			- Predict 0 if h(x) < 0.7
+
+		If we do this, we will end up with a classifier that has higher precision but lower recall.
+
+		However, what if we want to avoid missing too many cases of cancer? (avoid false negatives)
+		Here, we need higher recall so 
+			- Predict 1 if h(x) >= 0.3
+			- Predict 0 if h(x) < 0.3
+
+		Higher recall, lower precision.
+
+		This raises a new question, is there a method to choose this recall/precision value?
+		Since we can't use our regular method to evaluate how well our model is doing, 
+		we can do the averages:
+			p+r/2
+
+			We can see which classifier has the highest average value,
+			but it turns out that this method does not work very well.
+			Like all averages, it can be very skewed. A very high recall but very low precision can give us
+			a higher average than the rest of the options. 
+		
+		For this problem, we use the F Score, this evaluates our precision/recall model:
+		F Score:
+			2 * ((p*r)/(p+r))
+		
+		The highest F Score model is the best model.
+
+
+
+
+
+
+Using Large Datasets:
+
+	How much data to train on?
+	Under CERTAIN conditions, more data can really help our model.
+
+	"It's not who has the best algorithm that wins, it's who has the most data"
+	When is this true and when is this not true?
+	##################################################################
+	Useful test: Given the input x, can a human confidently predict y?
+	##################################################################
+
+	Large data rationale:
+		Use a learning algorithm with many parameters (e.g. logistic regression, linear regression with many features; neural network with many hidden units)
+		> Low bias algorithms
+		J_train(theta) will be very small
+		> Use a very large training set (unlikely to overfit) or Low variance
+		J_train(theta) roughly equal to J_test(theta)

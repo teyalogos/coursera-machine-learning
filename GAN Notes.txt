@@ -1,0 +1,24 @@
+Generative Adversarial Networks (GANs):
+A GAN has 2 networks, a discriminator network and a generative network.
+The generative network is fed random noise and generates (let's say) an image from the noise.
+The discriminator network guesses if the image is real or fake, here it returns an error.
+Based on that error, the generative network improves itself. (If the error is high, it's not realistic enough and vice versa)
+
+We give the discriminator a real iamge, get it's error
+Then we generate a fake image, give the discriminator that.
+So it alternates between real then fake then real then fake then so on.
+It's a cycle.
+
+The discriminator constantly improves itself on the generator and 
+the generator constantly improves itself on the discrimator. 
+Eventually the generator will create such good images that the discriminator 
+is going to output 0.5, it's literally 50/50 or indistiguishable.
+
+We use the gradient of the discriminator, to train the generator.
+
+The generator is trying to make the error of the discriminator higher
+and the discriminator is trying to make it's own error less.
+It's like a competition.
+
+A lot of networks do this, it's called adversarial training where 2 networks 
+fight over the value of a number.
