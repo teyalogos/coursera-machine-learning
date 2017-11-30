@@ -1,12 +1,761 @@
 Machine Learning Week 7 
 
+We will be discussing the SUPPORT VECTOR MACHINE
 
+Remember to take a screenshot and add to every section
 
+QUESTIONS:
 
+1. Practice on plotting, I know that theta0 is the origin point but I forgot everything else.
+Ask about the question on video 2.
 
-
+2. Why do we need the norm of theta to be smaller? I thought we only needed to minimize the cost.
+   it helps minimize the entire cost because it's a contribution
+   
+3. Ask about the question on video 3.
+Okay so we need to calculate the optimal value of ||theta||.
+So the value of ||theta|| that will satisfy our constraints.
+They say we know that P is equal to 2 but how? OH IT'S THE SAME PLOT WE USED A WHILE AGO!!
+Okay, so we know that P is equal to 2, now we need to multiply the optimal value of ||theta||
+to P and see if it satisfies our constraints, but how will we find the optimal value of ||theta||?
 
 
 Optimization Objective:	
+	
+	The support vector machine is a bit like the logistic regression algorithm
+	
+	Remember if y=1, we want h(x) to be roughly 1 as well this means that theta transpose x
+	must be greater than zero.
+	and vice versa, we want h(x) to be roughly equal to 0 if y is equal to zero as well.
+	
+	Remember that our hypothesis for logistic regression is:
+		h(x) = 1/(1+e^(-theta'*x))
+		z = theta'*x
+	And our cost function for only training example is this
+	(Normally we would have the 1/m term and sum over all 
+	examples but this is only for 1 training example):
+		-(y*log(h)) - (1-y)*log(h)
 		
 	
+	Let's discuss the case where y is equal to one:
+		
+		In this case, only the first term matters because the second term will equate to zero.
+		What we get is this term:
+			-log(1/(1+e^-z))
+		
+		If we plot this as a function of z,
+		what we see is that when z is equal to large,
+		that corresponds with a z function that contributes very small
+		to the cost function.
+		
+		This kinda explains why that when logistic regression sees a positive example,
+		it tries to set Z to be very large. Because that corresponds to to this term
+		in the cost function as being small.
+	
+	
+	Now what we're gonna do to this cost function is to get this term:
+		-log(1/(1+e^-z))
+	and modify it a little bit, when we plot our new term, it's gonna look similar 
+	to our previous plot but now it has two line segments. The one approaching positive 
+	is gonna be very flat and the one approaching negative is gonna rise linearly.
+	
+	A lot like this: https://cdn-images-1.medium.com/max/1600/1*XxxiA0jJvPrHEJHD4z893g.png
+	
+	This is gonna be our new cost function, it's very similar to logistic regression but this will
+	give us a computational advantage.
+	
+	
+	For the case of where y is equal to zero:
+		Our first term will equate to zero.
+		This gives us this term:
+		-log(1- (1/(1+e^-z)))
+		
+		If we plot this as a function of z, it's going to look like 
+		and inversion of when we plotted z in the case where y is equal to one.
+		
+	Now again, when we change this term a bit we're gonna get something similar like this:
+	https://cdn-images-1.medium.com/max/1600/1*XxxiA0jJvPrHEJHD4z893g.png
+	
+	We're gonna call:
+		-log(1/(1+e^-z))
+	cost_1(z)
+	
+	and:
+		-log(1- (1/(1+e^-z)))
+	cost_0(z)
+	
+	
+	Armed with these definitions, we are now ready to build a support vector machine:
+		
+		We're gonna replace our previous terms:
+			-log(1/(1+e^-z)) and -log(1- (1/(1+e^-z)))
+		with cost_1(z) and cost_0(z)
+		
+		So:
+			min(theta)
+			(1/m) * sum(y*cost_1(z)+(1-y)*cost_0(z)) + regularization
+			
+		With SVMs, our notation is a bit different. We're gonna take away our (1/m) term
+		(Since 1/m is just a constant, we're still gonna end up with the same process)
+		The second bit of change in notation is that we're gonna change the terms a bit.
+		Originally, in logistic regression, we had 2 terms:
+		
+			A which is equal to the cost finding 
+			lambda*B which is equal to our regularization parameter.
+		
+		With SVMs we will have these terms:
+		
+			Instead of using lambda to control the relative weighting of
+			A and B,
+			We're gonna use a different parameter which is C
+			so our new term is gonna be 
+			C*A+B
+			
+			So if we set a very large value for lambda, this will give B a very high weight 
+			here, is that when we set C to be a very small value, then this corresponds to giving
+			B a much larger weight than A.
+			
+		This is just a different way of controlling the trade-of,
+		a way of parameterizing how much we care about optimizing the first term (A)
+		or the second term (B)
+		
+		Hypothesis:
+			h(x) = 1 if z >= 0
+			else h(x) = 0
+			
+	SECOND TIME WATCHING:
+	
+	When z is equal to large, when theta transpose x is equal to large,
+	that corresponds to a very small value, a very small contribution
+	to our cost function. Remember that when y is equal to 1, our second term goes 
+	away because it just equates to zero. 
+	
+		-log(1/(1+e^-z))
+	
+	So again, when y is equal to 1, logistic regression tries to set z 
+	(theta transpose x) to very large because that corresponds to the 
+	first term in the cost function as being small.
+	
+	And a small contribution to the cost function, including the removal of the
+	second term because it just equates to zero if our y is equal to 1
+	gives us a very small cost.
+	
+	For both cases of y is equal to zero and y is equal to one,
+	instead of having a smooth curve when we plot as a function of z,
+	we're gonna have a ridged straight plot much like this:
+	https://cdn-images-1.medium.com/max/1600/1*XxxiA0jJvPrHEJHD4z893g.png
+	
+	We're gonna call these new terms
+	cost_0(z) and cost_1(z)
+	
+	Armed with these definitions, we are now ready to build a support vector machine:
+		
+		We're gonna replace our previous terms:
+			-log(1/(1+e^-z)) and -log(1- (1/(1+e^-z)))
+		with cost_1(z) and cost_0(z)
+		
+		So:
+			min(theta)
+			(1/m) * sum(y*cost_1(z)+(1-y)*cost_0(z)) + regularization
+			
+		With SVMs, our notation is a bit different. We're gonna take away our (1/m) term.
+		Since 1/m is just a constant, if we calculate with the term or not,
+		we should still be left with the optimal value for theta.
+		Intuition:
+			Suppose we have an algorithm where:
+				min(u-5)^2+1
+			and we know that the optimal value for u=5,
+			if we take this objective function and multiply it by ten:
+				min((u-5)^2+1)*10
+			Well the value that still minimizes this is STILL u=5 right?
+			So multiplying something that you're minimizing over,
+			by some constant, 10 in this case, it does not change 
+			the value of U that minimizes this function.
+		The second bit of notation change is the following:
+			In logistic regression, we had two terms in objective function;
+			the first is the cost coming from the training set and the second 
+			is the regularization term.
+			We control the trade-off between these by
+			A+lambda*B
+		What we did was by setting different values for our regularization term lambda,
+		we could trade-off the relative weight between how much we wanna fit the training set well
+		that is minimizing A versus how much we care about keeping the values of the parameters small.
+		
+		For the support vector machine, by convention, we're gonna use other paramters.
+		So instead of using lambda to control the weights between the first and second term,
+		instead we're gonna use a different paramter which by convention is called C.
+		And instead we're gonna minimize C*A+B.
+		
+		So for logistic regression, if we set a very large value of lambda, we're gonna give B 
+		a very high weight. Here, is that if we set C to a very small value, then that 
+		corresponds to giving B a much larger weight than A.
+		
+		This is just a different way of controlling the trade-off, a different way 
+		of prioritizing how much we care about optimizing the first term versus 
+		how much we care about optimizing the second term.
+		We can look at this like C playing a role similar to one over lambda (1/lambda)
+		
+		It's not that these two equations or expressions will be equal,
+		it's rather that when C is equal to 1/lambda, then these two optimization objectives
+		should give you the same optimal value for theta.
+	
+	So now we have our complete SVM cost function.
+	If we minimize this function, what we'll have are the
+	parameters learned by the SVM.
+
+	Hypothesis:
+		
+		And again, since with the SVM, we don't calculate the probability of y,
+		it just makes a straight forward prediction so:
+			h(x) = 1 if z >= 0
+			else h(x) = 0
+
+
+
+	
+Large Margin Intuition:
+	
+	With our cost function,
+	if y = 1, we want z >= 1 (not just >= 0)
+	if y = 0, we want z <= -1 (not just < 0)
+	
+	With the SVM, we predict 1 once it's higher that 0
+	and we predict 0 if it's a bit lower than zero.
+	This is an interesting property of the SVM,
+	however the SVM wants a bit more than this.
+	Instead of a bit higher than 0, we want it to be a lot higher than 0
+	so we have an extra safety factor and vice versa.
+	
+	Let's see what the consequences of this are for the SVM
+	
+	Let's set C to a very large value, maybe a 100,000.
+	Let's see what the SVM will do;
+	
+	What will it take to make our first term (A which is our cost)
+	close to zero (basically minimizing cost) because we've set C to some 
+	huge constant. Hopefully this will give us some intuition of how an
+	SVM will learn. So, we've seen already that whenever for example we have
+	an example where y is equal to one, we need to find a theta transpose x (z)
+	that is greater than or equal to one and vice versa.
+	
+	If we think about our optimization parameter as choosing parameters that 
+	will make the first term equal to zero (regular minimize J problem);
+	what we're left with is this problem:
+	
+		min C*0+1/2*B
+	
+	This will be subject to the constraint that z >= 1 if y = 1
+	and z <= -1 if y = 0
+	
+	It turns out that when we solve this optimization problem with our current cost function,
+	we get a very interesting decision boundary;
+	https://docs.opencv.org/2.4/_images/optimal-hyperplane.png
+	
+	With logistic regression, it will calculate an unnatural line.
+	With an SVM, we calculate a well balanced line, as you can see there is a space
+	around our plotted line, this is called the "margin".
+	This gives the SVM a certain robustness because it tries to separate the data 
+	with as large of a margin as possible. Because of this, the SVM is sometimes called a 
+	large margin classifier. This is a consequence of the previous optimization problem we wrote down earlier.
+	
+	How does that lead to this large margin classifier though? Neeeextttt section we will discuss!
+	
+	However, take note that this is not a complete general intuition of the SVM.
+	This is only in the case where C is equal to a large value.
+	In other cases, the SVM might choose a different decision boundary.
+	
+
+
+
+
+
+
+Mathematics Behind Large Margin Classification:
+
+	Vector Inner Products:
+	
+		u = [ u1
+			  u2 ]
+		v = [ v1
+			  v2 ]
+
+		So we have 2 vectors, both 2 dimensional size vectors.
+		We plot u1 as the horizontal axis and u2 as the vertical axis, this also applies for when we plot v.
+			
+		||u|| = norm of u = sqrt(u1^2 + u2^2) = euclidean length of u
+		p = length of the projection of v onto u (orthogonally or at a 90 degree angle)
+		
+		So the inner product is the projection of v onto u times the norm or euclidean distance of u.
+		So the inner product is this:
+			u'v = p * ||u|| = u1v1+u2v2
+		
+		NOTE: The inner product can be negative if the angle between them is greater than 90 degrees
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%207%20Screenshots/Inner%20Product%201.png
+	
+	SVM Decision Boundary:
+		
+		Simplification:
+			We won't have a bias term so theta0 = 0
+			n = 2 and we'll set our number of features to 2
+			
+			For simplificiation purposes, we can write this term down like this:
+				min (1/2) * sum(theta^2) is equal to:
+				(1/2) * (theta1^2 + theta2^2) is equal to:
+				(1/2) * sqrt(theta1^2+theta2^2)^2
+				
+				Which if you notice is also the norm of theta so 
+				this is also equal to ||theta||
+		
+			So this means that our optimization object is equal to (1/2) * ||theta||^2
+			
+			So all the SVM is doing is minimizing the squared norm or squared length
+			of theta.
+			
+		Intuition on theta transpose x terms (z):
+			
+			theta'x >= 1 if y = 1
+			theta'x <= -1 if y = 0
+			
+			In the last section we discussed what u'v might of looked like,
+			we can apply the same definitions with theta'x.
+			
+			So let's see what that'll look like:
+			x1 = horizontal axis
+			x2 = vertical axis
+			theta1 = horizontal axis
+			theta2 = horizontal axi
+
+			What is the inner product of theta'x?
+			So we get the inner product by multiplying P (see reference in image and inner product section)
+			by the norm of theta or ||theta||.
+			
+			So theta'x  = p * ||theta||
+			
+			So what does this leave us?
+			The constraints where theta'x has to be equal to or greater than 1 if y is equal to 1
+			and vice versa, what this means is we can replace these with constraints that
+			P times the norm or euclidean length of theta must be greater than or equal to 1 if y is equal to 1
+			and vice versa.
+			
+	
+	Remember that our optimization objective can be re-written:
+		min (1/2) * sum(theta^2) is equal to:
+		(1/2) * (theta1^2 + theta2^2) is equal to:
+		(1/2) * sqrt(theta1^2+theta2^2)^2
+		
+		and theta'x can be re written as:
+		theta'x  = p * ||theta||
+		
+	And the simplification theta0 = 0.
+	
+	Let's see the boundary that the SVM will choose:
+		
+		The SVM will NOT choose the boundary on the lower left corner.
+		Why? If you take a look at the POSITIVE projection of one of the training examples to theta,
+		their values will not contribute enough to theta'x to be higher than or equal to 1.
+		This is not what the SVM will choose.
+		
+		The only way we can make theta'x to be larger is to make the norm of theta to be larger,
+		this requires changing our optimization parameters theta which remember is just optimization.
+		
+		Similarily, our NEGATIVE example's P needs to contribute less to satisfy theta'x must be lower than
+		or equal to -1. And again, the only way we can change the theta'x is to change the theta parameter.
+		
+		The SVM's optimization objective is it's trying to find parameters where the norm of theta is small,
+		so this doesn't seem like a good direction for our parameter theta.
+		
+		In contrast, let's look at a different decision boundary at the lower right corner.
+		
+		This gives us a very different picture. Now, if we project our training examples to theta,
+		what we find is that the lengths of our projections are much bigger and so if we still need 
+		to enforce our constraints, since P is so much bigger now, the norm of theta can be smaller.
+		And we want the norm of theta to be as small as possible.
+		
+		So again, our SVM will choose this decision boundary because the projects of P are much bigger
+		which allow us to make theta smaller which is the optimization objective of our SVM.
+		
+		This is how our SVM leaves us with this large margin effect.
+		
+		Our decision boundary wants to be as far away from the training examples as much as possible
+		because it needs it's P to be as big as possible.
+		
+		Also remember that we set our theta0 to 0 so that our decision boundary would only pass the origin
+		for simplification purposes.
+		
+		REMINDER Why do we want theta's norm to be as small as possible?:
+			Ask Nikhos, remember that our optimization objective equation says to minimize
+			theta but I thought we were supposed to minimize the cost?
+			Nikhos told me it can help minimize the cost.
+			
+		Question in the video:
+			Ask Nikhos tomorrow
+			
+			
+			
+Kernels I:
+	
+	If we want a non-linear hypothesis, one way to do so is to make a set
+	of complex polynomial features.
+	
+	Remember our hypothesis:
+		h(x) = 1 if theta0 + theta1x1 ... theta_nx_n >= 0
+		0 otherwise
+		
+	Another way of writing this, for the new notation he'll use later is that we can think
+	of our hypothesis as computing a decision boundary with this:
+		theta0 + theta1f1 + theta2f2 ...
+		Where f1 is just equal to x1
+		and f2 is just equal to x2
+		f3 is just equal to x1x2
+		f4 is just equal to x1^2
+		and so on...
+		
+	We already know that coming up with these high-order polynomials is a way to make a lot of features 
+	but the question is that is there a better choice of features in these high-order polynomials?
+		
+	Heres one way to define our new features such as f1, f2, f3:
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%207%20Screenshots/Making%20our%20new%20features.png
+		l1, l2, l3
+		
+		Let's just say that we picked these new points manually
+		and we called them landmark.
+		
+		What we're gonna do is define our features as follow:
+			
+			Given x: f1 = similarity between training example x and our first landmark
+					 f1 = simalarity(x, l) = exp(-(((||x-l||)^2)/(2sigma^)))
+					 
+					Remember that ||a-b|| mean the norm or euclidean distance between a and b
+					
+			That's our first feature, heres our second feature:
+					f2 = similarity(x,l(2)) = exp(-(((||x-l(2)||)^2)/(2sigma^)))
+			Then our third feature:
+					f2 = similarity(x,l(3)) = exp(-(((||x-l(3)||)^2)/(2sigma^)))
+					
+	
+	Our similarity function, the mathematical definition is a kernel function.
+	The specific kernel we're using there is called a "gaussian kernel".
+	We'll discuss the other kernel functions later
+		
+		
+	Kernels and Similarity:
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%207%20Screenshots/Kernels%20and%20Similarity.png
+		
+		So let's take our landmark l1.
+		The similarity of the kernel between x1 and l1 is given by this expression:
+			f1 = simalarity(x, l) = exp(-(((||x-l||)^2)/(2sigma^)))
+			remember that the numerator ||n|| can also be written as:
+			sum(x-j)^2
+			
+		Remember that we're ignoring our intercept/bias term x0 here for the purpose of simplification.
+			
+		Let's see what this function does:
+			
+			Suppose x is close to one of the landmarks, then that means the euclidean
+			distance term in our expression will be close to zero; ((||x-l||)^2)
+			
+			and so f1 will be approximately e(-(0^2)/2sigma^2) is equal to close to 1
+			
+			Conversely, if x is far from l1
+			
+			Then f1 is going to be equal to e(-(large_number)^2/2sigma^2) and e to minus of a large number,
+			is going to be close to 0.
+			
+			So what these features do is they measure how similar x is from one of our landmarks
+			and so 
+			f1 = close to 0 if x is far from landmark
+			f1 = close to 1 if x is close to our landmark
+			
+		Each of the landmarks in the previous section defines a new feature,
+		given the training example x, we can now compute the new features (f1, f2, f3)
+		
+		
+		Let's plot our exponentation function, our similarity function 
+		just to get a better intuition as to what it looks like:
+			
+			For this example, let's say we have two features:
+				l1 = [3
+					  5]
+				and x1, x2
+				
+				And let's say we set sigma^2 to 1 for now.
+				If we plot f1 = exp(-(((||x-l||)^2)/(2sigma^)))
+				we kind of get the figure on the left of the lecture slide.
+				
+				The height of the figure is equal to the height of f1
+				and the horizontal are x1 and x2.
+				
+				You notice that when x is equal to [3 5] exactly, f1 takes the value of 1
+				and as x moves away from that value, f1 gets closer to 0.
+				
+				And so f1 measures how close x is to the landmark. 
+				If x1 and x2 were [3 5], as you can see in the plot, f1 is 1
+				because l1 is [3 5]. Remember, f1 is close to 1 if x is close to l
+				
+			
+			Let's see the effects of varying our parameter sigma^2:
+				
+				So sigma^2 is a parameter of the gaussian kernel
+				and as we vary it, we get different effects.
+				
+				Let's set sigma^2 = 0.5, we get the plot at the middle of the lecture slide.
+				As you can see, nothing really happens but our bump gets narrower.
+				The counters shrink a bit too.
+				
+				and conversely, if we were to increase sigma^2 to 3,
+				our bump gets larger. We can see this on the plot rightest in our lecture slide.
+				
+				So the larger sigma^2 is, the slower our f1 value falls.
+				If sigma^2 is smaller, the faster our f1 value falls.
+				
+		
+		
+		Okay so given this definition of the features, let's see what kind of hypothesis we can learn:
+			
+			https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%207%20Screenshots/Hypothesis%20Example.png
+			
+			We're going to compute these new features; f1, f2, f3
+			our hypothesis is going to predict if theta0+theta1f1+theta2f2... is going to be greater
+			than or equal to 0.
+			
+			Let's say we've already run a learning algorithm and some how we've ended up with the values
+			theta0 = -0.5
+			theta1 = 1
+			theta2 = 1
+			theta3 = 0
+			
+			and what we wanna do is consider what happens if we have a training example
+			where the magenta dot is. Let's say we have a training example x, what will our
+			hypothesis predict?
+			
+			Since x is close l, we have that f1 is going to be close to 1,
+			but since x is far away from l2 and l3, f1 is going to be close to 0
+			and f3 is going to be close to 0.
+			
+			If we look at our formula:
+			theta0 + theta1x1 + theta2x2
+			so this is going to be equal to, plugging in our values now:
+			= -0.5 + 1 = 0.5 >= 0 
+			So here, we're going to predict y is equal to 1 because that's
+			greater than or equal to 0.
+			
+			Now let's take a different point, our cyan point.
+			If that were our training example x, if we make a similar computation as before,
+			all of our fs are going to be close to 0 (f1, f2, f3)
+			
+			So now if we apply our formula again, our output is going to be around -0.5 
+			because theta0 is -0.5 and the rest of the values are being multiplied by numbers
+			very close to 0. So this would be around -0.5.
+			So at this point, we'll predict y = 0.
+			
+			So, interestingly;
+			If our feature x is far away from our landmarks, we will predict 0
+			but if ouor feature x is close to our landmarks, we will predict 1.
+			
+			As you can see, we can come up with pretty complex non-linear hypothesis/decision boundaries.
+			
+			
+	So this is part of the idea of kernels and how we could use them with the support vector machine.
+	
+	- We define our extra features using landmarks and similarity function to learn more complex non-linear classifiers.
+	
+	There are still a couple of questions we haven't answered yet which are:
+	- How do we choose these landmarks?
+	- Are there any other similarity functions that we can use other than the gaussian kernel?
+	
+	
+	
+Kernels II:
+
+	Introduction:
+		In the previous section we talked about the kernels idea and how it can be used to create new 
+		features for our support vector machine. In this section, we’re going to fill in the missing 
+		details and discuss how to use these new ideas in practice and how they pertain to, for example 
+		the bias/variance trade-off in SVMs.
+		
+	Choosing the landmarks:
+		In the previous section, we talked about the process of picking a few landmarks; l1, l2, l3 and that allowed us to declare our similarity function; our Gaussian kernel function. And that allowed us to build a hypothesis function. But where do we get l1, l2, l3 and other landmarks?
+		Here’s how we’re going to do it, so given a machine learning problem, we are given a dataset with some positive/negative examples. So the idea is that we’re gonna take the examples, and for every training example, we’re gonna set a landmark for it. 
+		For example, let’s say we chose x1, we’re gonna pick a landmark l1 at the exact same location as x1. And if we have a different example, let’s say x2, we’re gonna pick a landmark l2 at the same location as x2. 
+		So after this process, we’re gonna end up with m landmarks (remember m = training set size). This is nice because our features are basically going to measure how close our features are to our training set.
+	
+	SVM with Kernels:
+		So just to write this down more concretely:
+			Given (x1, y1), (x2, y2), … ,(xm, ym)
+			Choose l1 = x1, l2 = x2, … ,lm = xm,
+			Given example x:
+				f1   = similarity(x,l1)
+				f2   = similarity(x,l2)
+				
+	Remember our example x can be from the cross validation set, the training set, the test set, anything.
+	
+	So then values can give us a feature vector so:
+		f = [f1 f2 ... fm]
+	And just by convention we add an intercept term f0 which is always equal to 1
+	
+	So for example, given xi, we would map it to:
+		f(1)i = sim(x(i), l1)
+		f(2)i = sim(x(i), l2)
+		f(3)i = sim(x(i), l3)
+		f(4)i = sim(x(i), l4)
+		and so on up to 
+		f(m)i = sim(x(i), lm)
+	
+	Somewhere in the middle, at the ith component, we're gonna reach
+		f(i)i = sim(x(i), li)
+	Which is just the similarity of xi so with the gaussian kernel that's gonna be equal to 1
+		
+	And similarily, we can get all these f values and represent them in a feature vector so:
+		f(i) = [f(i)0 f(i)1 ... f(i)m]
+		
+	So given these kernels and similarity functions, heres how we use an SVM:
+		
+		If we already have a learned set of parameters theta and given an example x,
+		what we do is compute the features f which is now an Rm+1 (we have m there
+		because we have m landmarks) feature vector and:
+			Predict y=1 if theta'f >= 0
+			
+		And remember that theta'f is now equal to:
+			theta0f0 + theta1f1 + theta2f2 ... thetamfm
+		So now our parameter vector theta is also going to be an m dimensional vector.
+		So m was the training size so theta is going to be m+1 dimensional.
+		
+		So that's how we make a prediction if we already have theta, but
+		how do we get the parameters theta? Well we do that with the SVM learning algorithm,
+		and specifically what we do is solve this minimization problem:
+			
+			t1 = y*cost_1(theta'f)
+			t2 = (1-y)*cost_0(theta'f)
+			B = (1/2)*sum(theta^2)
+			min C * sum(t1+t2) + B
+			
+		So instead of making predictions with theta'x, we replace them with our new features
+		theta'f
+		
+		One more detail, in the equation, n is equal to m+1 since n is just the number of features we have
+		And remember we do not regularize theta0
+		
+		And one more mathematical detail, the last term B is done a bit differently. 
+		We can also write sum(theta^2) as theta'theta and what most SVM implementations do is
+		replace theta'theta with instead theta' * some matrix inside that depends on the kernel we use
+		* theta.
+		
+		Instead of minimizing directly the norm of theta squared, we instead minimize something similar
+		to it, like a rescale version of the parameter vector theta. This is a mathematical detail
+		that allows our software to run much more efficiently. The reason why the SVM does this
+		is because this allows it to scale much better with bigger training sets. 
+		
+	And yes we can run a kernel with logistic regression however it won't really help much
+	and will just slow down the algorithm. The optimization tricks we use with the SVM
+	don't generalize well with other algorithms such as logistic regression. Because of computational
+	tricks in the SVM, SVMs and kernels work particularily well together whereas logistic regression
+	and kernels, we can do it but it will run very slowly and it won't be able to take advantage
+	of advanced optimization techniques such as the ones people use with SVMs and kernels.
+		
+		
+	When applying an SVM, how do we choose the parameters?:
+		
+		Bias/variance trade-off:
+			
+			When using an SVM, we need to choose the parameter C.
+			And if we recall, C plays a similar role to (1/lambda) where lambda is the regularization
+			parameter in logistic regression. 
+			
+			So if we have a large value of C, this corresponds to having a small value of lambda
+			meaning not using much regularization. And if we do that, we tend to have a hypothesis 
+			with lower bias and higher variance. 
+			
+			Whereas if we use a smaller value of C, this corresponds to having a large value of lambda
+			meaning higher regularization. So higher bias but lower variance.
+			
+			Large C: Lower bias, high variance 
+			Small C: Higher Bias, low variance 
+			
+		sigma^2 for the gaussian kernel:
+			
+			So if we have large value of s2, in the similarity function, features f will vary more smoothly
+			so higher bias, lower variance 
+			
+			Whereas in contrast, if we have a smaller value of s2, features f will vary less smoothly 
+			so lower bias, higher variance
+			
+			
+			
+			
+			
+			
+			
+Using an SVM:
+	
+	So far we've only been talking about SVMs in a fairly abstract level, in this section
+	we'll be talking about what we actually need to do in order to run or use an SVM
+	
+	With the support vector machine problem, since we shouldn't actually write the
+	code that will solve for the parameters theta ourself, we'll be using the libraries...
+	
+	We need to specify:
+		Choice of parameter C
+		Choice of Kernel (similarity function:
+			e.g no kernel ("linear kernel")
+				predict y=1 if theta'x >= 0
+				
+				Why would we want to choose this?
+				If for one, our number of training examples are quite small
+				and we just want a linear hypothesis.
+				
+			Gaussian kernel:
+				- need to choose sigma^2
+				- If we want to fit a more complex, non linear hypothesis
+				
+				If we are going to use this, we need to implement our own kernel function so
+					function f = kernel(x1, l1)
+						f = exp(-(||x1-x1||/2sigma^2)
+					return 
+					
+				NOTE: if we have features of very different scales,  
+					   perform feature scaling before using the gaussian kernel.
+					   
+	
+	
+	Other Choices of a kernel:
+		
+		Note: Not all similarity functions make valid kernels.
+			(Need to satisfy technical condition called "Mercer's Theorem" to make sure
+			SVM packages' optimizations run correctly, and do not diverge)
+			
+		Many of the off-shelf kernels:
+			- Polynomial kernel
+				k(x,l) = (x'l)^2, (x'l)^3, (x'l + 1)^3
+				so (k'l+c)^degree
+				
+				Usually used when our training examples are never negative.
+			- More esoteric kernels: String kernel, chi-square kernel, histogram intersection kernel, ...
+			
+	Multi-class classification:
+		
+		Many SVM packages already have the multi-class classification functionality built in.
+		
+		Otherwise, use one-vs-all method. (Train K SVMs, one to distinguish y=i from the rest,
+		for i = 1, 2 ... K) get theta1, theta2, ... , thetak
+		Pick class i with largest (theta(i))'x
+		
+	Logistic Regression vs SVMs:
+		
+		How do we choose which algorithm?
+		
+		n = number of features (x = Rn+1), m = number of training examples
+		If n is large (relative to m): text classification problems; n=10,000 m=10 ... 1000
+			Use logistic regression or an SVM without a kernel (linear kernel)
+		
+		if n is small, m is intermediate: n=1000 m=10 ... 10,000
+			Use SVM with Gaussian kernel
+			
+		if n is small, m is large: n=1-1000, m=50,000 ... 2,000,000
+			Create/add more features, then use logistic regression or SVM 
+			without a kernel.
+			
+			SVMs have a problem scaling with a massive training set size.
+			
+		Neural network would likely work well for most of these settings but may be slower to train
