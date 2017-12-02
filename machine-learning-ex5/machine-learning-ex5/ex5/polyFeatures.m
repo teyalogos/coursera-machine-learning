@@ -15,10 +15,12 @@ X_poly = zeros(numel(X), p);
 %
 % 
 
-
-
-
-
+for i=1:p #Loop through the amount of polynomial features
+  #Set our m*1 features matrix X to the ith power.
+  #Set X_poly's ith column to X to the ith power.
+  #Where i loops over the amount of polynomials we want
+  X_poly(:,i) = X(:,1).^i; 
+end
 
 % =========================================================================
 

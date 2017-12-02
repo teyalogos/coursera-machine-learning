@@ -39,12 +39,16 @@ error_val = zeros(length(lambda_vec), 1);
 %
 %
 
-
-
-
-
-
-
+for i = 1:length(lambda_vec)
+  lambda = lambda_vec(i);	
+  
+  #Get theta for our cost function
+	theta = trainLinearReg(X, y, lambda);	
+		
+	#Store our errors for the training set and the cross validation set (Xval/yval)
+	error_train(i) = linearRegCostFunction(X, y, theta, 0);
+	error_val(i) = linearRegCostFunction(Xval, yval, theta, 0);
+end
 
 
 

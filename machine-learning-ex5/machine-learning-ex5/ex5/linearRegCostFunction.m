@@ -27,8 +27,6 @@ reg_cost = (lambda/(2*m)) * sum(thetaT .^ 2);
 J = (1/(2*m)) * sum((h - y) .^ 2) + reg_cost;
 
 reg_grad = (lambda/m) * thetaT;
-size(h-y)
-size(X')
 grad = (1/m) * X'*(h - y) + reg_grad;
 
 % =========================================================================
