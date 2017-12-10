@@ -1,0 +1,323 @@
+Machine Learning Week 8:
+
+UNSUPERVISED LEARNING!!
+
+
+
+
+Unsupervised Learning:
+	
+	In supervised learning, the machine learns with labels. Unsupervised learning has no labels.
+	
+	What is unsupervised learning?
+	
+	In a supervised learning scenario, if we want to separate 2 clusters of data, we would be given their
+	labels, which is what cluster they fall into. With unsupervised learning, we tell the algorithm
+	to find some structure in the data. 
+	
+	This is called a clustering algorithm, this is one category of an unsupervised learning algorithm.
+	
+	What are it's applications? Here are a few examples,
+		- Market Segmentation
+		- Social Network Analysis
+		- Organize Computing Clusters
+		- Astronomical Data Analysis
+		
+K-Means Algorithm:
+	
+	The K-Means algorithm is by far the most popular clustering algorithm, we will be discussing this
+	algorithm.
+	
+	This is how the K-Means Algorithm works:
+		
+		Let's say we want to classify these 2 clusters, first we initialize 2 random points
+		which we call the cluster centroids. We have two of them because we want to group our
+		data into 2 clusters.
+		
+		K-Means is an iterative algorithm. And it does two things.
+		First is the cluster assignment step then the move centroid step so
+		
+		Assign Clusters:
+			https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%208%20Screenshots/Step%201%20Assign%20Clusters.png
+		
+			In this step, the closest cluster to the specified centroid is assigned to that centroid.
+		Move Centroid:
+			https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%208%20Screenshots/Step%202%20Move%20Centroids.png
+		
+			In this step, from the perspective of centroid B. We will get all the points that
+			are closest to centroid B and calculate the average distance of all of them
+			from centroid B. We then do the same thing for centroid R. We then move the
+			cluster centroids based on that value.
+			
+		We keep looping through these steps.
+		
+	K-Means Algorithm more formally:
+		
+		Input:
+			K - Number of clusters 	
+			Training set
+		
+		x(i) = R(n) (drop x0 = 1 convention)
+		
+		NOTE: Uppcase K notates the number of cluster centroids and lowercase k notates the index of the different cluster centroids
+		
+		- Randomly Initialize K cluster centroids u1, u2, ... , u(k) = R(n)
+		Repeat{
+			
+			#Assign Cluster
+			for i=1:m
+				#Index from 1 to K of cluster centroid closest to x(i)
+				c(i) := norm(x(i) - u(k));
+				#Find the value of k that minimizes the distance between x and the current centroid cluster or u(k)
+				#That's what set into c(i)
+				#NOTE: By convention, people square the norm.
+				
+				#For example, c(3) = 5 means that the x(3) was assigned to cluster 5
+			end
+				
+				
+			#Move centroid
+			for k=1:K
+				#For each of our cluster centroids, it sets u(k) to the average of the points
+				#assigned to cluster k
+				u(k) := mean(points(k));
+				#For an example let's say u(2) has training examples; 1, 5, 6, 10
+				#This means that c(1) = 2, c(5) = 2, c(6) = 2, c(10) = 2
+				#In this move centroid step, we compute the average (mean) of these 4 points
+				#and store them into u(k)
+				#Remember that u(k) is the position of the cluster centroid, so here we're changing it's position
+			end
+		}
+		
+		What if we have a cluster centroid with ZERO points assigned to it? What'll happen?
+		In that case, the most common thing to do is to eliminate that centroid. So we'll end up with
+		K-1 clusters instead of K clusters. If we really need K clusters though, we can just re-randomly
+		initialize the cluster. But it's more common to just eliminate a cluster. 
+		
+	
+	K-Means for non-separated clusters:
+	
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%208%20Screenshots/K-Means%20with%20un-separated%20examples.png
+		
+		Out of all the training examples we've shown so far, they're pretty well clustered examples.
+		In some scenarios, we have not so well clustered examples.
+		
+		
+Optimization Objective:
+
+	Most of the supervised learning algorithms have an optimization objective 
+	or a cost function they are trying to minimize. It turns out that
+	KM also has it's own optimization objective or cost function it will try to minimize.
+	
+	Knowing our cost function will be useful for debugging and making sure K-Means is working correctly.
+	And also helping K-Means find clusters and avoid local optima.
+	
+	While KM is running, we will be keeping track of 3 variables 
+		- c(i)
+			Keeps track of the cluster than x(i) is currently assigned to
+		- u(k)
+			Our current centroid k
+			Remember, K = total number of clusters and k = index of cluster centroids
+		- uc(i) = Cluster centroid of cluster to which example x(i) has been assigned
+			x(i) is in cluster number 5
+			so c(i) = 5
+			so uc(i) = u5
+			because c(i) is equal to 5
+			So this is the cluster centroid of cluster number 5
+			which is the same cluster that x(i) is assigned
+			
+	Optimization Objective:
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%208%20Screenshots/K-Means%20Cost%20Function%201.png
+		The cost function that KM is minimizing is function J
+		of all parameters c(1) to c(m) and u1 to uk
+		
+		J(c(1),...,c(m),u1,...,uk) = (1/m) * sum(norm(x(i) - uc(i))^2)
+		x(i) = Location of x(i)
+		uc(i) = The cluster centroid of uc(i) or the cluster centroid that x(i) has been assigned to
+		norm(x(i) - uc(i))^2 = Squared distance between x(i) and it's assigned centroid.
+		
+		What KM is doing is to try to find c(i) and u(i)
+		to try and minimize our cost function J()
+		
+		The cost function is also called the "distortion" of the K-Means algorithm
+		
+	So
+	
+	K-means algorithm:
+		
+		Randomly initialize K cluster centroids u(1),...,u(k) = Rn dimensional
+		
+		Repeat{
+			#Assign Clusters
+			for i=1:m
+				c(i) := index of cluster centroid closest to x(i)
+			#Mathematically, we can prove that this is actually minimizing the cost function with our variables c(i)
+			#While holding u(1) up to u(k) fixed
+			#So this is just picking the values that's minimizing the cost function J
+			
+			#Move centroid step 
+			for k=1:K
+				u(k) := mean(points assigned to cluster k)
+				#Choose values of u that will minimize our cost function
+				#With the locations of our cluster centroids u(1),...,u(k)
+		}
+		
+		
+		
+		
+		
+		
+Random Initialization:
+	
+	- Should have K < m
+	- Randomly pick K training examples
+	- Set u(1),...,u(k) equal to these K examples
+	
+	Let's say that K is equal to 2 and we want to find 2 clusters.
+	We'll pick 2 random examples, we're gonna initialize our cluster centroids
+	on top of these random examples.
+	
+	Where i and j are random
+	u(1) = x(i)
+	u(2) = x(j) 
+	
+	
+	Local Optima:
+		
+		In order to combat local optima, what we can try is multiple random initialization
+		so initializing K-Means a lot of times to make sure we have the highest chance of getting
+		to the global optima.
+		
+		Let's say we want to initialize K-Means a hundred times
+		
+		for i=1:100{
+			Randomly Initialize
+			Run K-Means
+			Compute Cost Function
+		}
+		
+		Pick clustering that gave us the lowest cost
+		
+		This works well for a relatively small amount of clusters like K=1 to K=10
+		but if we're trying to find like hundreds of clusters, this won't do much
+		and our first iteration would likely be good enough. But if you want,
+		we can try to look for a smaller cost with this method even with a large amount of clusters.
+		But 1 iteration is good enough most of the time.
+		
+
+		
+		
+Choosing the Number of Clusters (Choosing the value of capital K):
+	
+	There isn't actually a perfect or optimal way to choose the number of clusters.
+	The most common way to do it is manually through visualizations or something like that.
+	
+	What is the right value of K?
+		
+	There isn't always a clear cut answer, this is why it's called unsupervised learning.
+	And this is one of the reasons why it's so difficult to choose the "right" value of K.
+		
+	One method though is the "Elbow Method":
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%208%20Screenshots/Elbow%20Method.png
+		
+		Vary K with multiple iterations of K-Means so
+		our first iteration will have one cluster, then our second iteration will have 3 clusters
+		and so on.
+		
+		After each iteration, we will compute the cost of K-Means.
+		
+		So maybe our first iteration will have 1 cluster and a high cost
+		then our second iteration will have 3 clusters and have a lower cost
+		and so on. So if we plot this, we will end up with a curve.
+		
+		With the curve we end up with, there is this point called the "elbow".
+		This tends to be where we pick our K to be at.
+		
+		If we apply the elbow method and get a plot similar to an elbow,
+		using the elbow method is a pretty reasonable way to choose the number of clusters.
+		
+		Most of the time though, we don't use the elbow method because most of our
+		plots will be more ambiguous.
+		
+		
+	Maybe we want to use K-Means to get clusters for some later/downstream purpose.
+	In this case, we evaluate K-Means based on a metric for how well it performs
+	for that later purpose.
+	
+	
+		
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+DIMENSIONALITY REDUCTION:
+
+Motivation I: Data Compression:
+	
+	We'll be talking about a second type of unsupervised learning problem; DIMENSIONALITY REDUCTION.
+	
+	For this section, we will be using Dimensionality Reduction for data compression.
+	
+	Let's say we have a dataset of many features. Unknown to us, one of the features x1
+	is the length of something in cm and another feature x2 is the length of something in inches.
+	Now this gives us a highly redundant representation. Maybe instead of having 2 features, 
+	we could reduce the data to only 1 dimensional and 1 number measuring the length.
+	
+	More technically, we could do this:
+		
+		We compress x1 and x2 into one feature vector; z1
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%208%20Screenshots/Data%20Compression%201.png
+		
+		In this case, reducing dimension means finding the line or direction in which most of the data seem to lie on.
+		Then project the data onto that line, measure the positions of each of the line and make a new feature z1 where x1 and x2 are compressed into.
+		So z1's features specify the position of each of the points on the green line.
+		
+		So previously:
+			x(1) = R(2)
+			x(2) = R(2)
+		Now:
+			x(1) > z(1) = R
+			x(2) > z(2) = R
+		So:
+			x(m) > z(m)
+			
+		
+	Reducing Data from 3D to 2D:
+		
+		So x(i) = R(3), We can compress these dimensions into z1 and z2 where z1 is the X axis and x2 is the Y axis
+		So z(i) = R(2)
+		Where: z(i) = [z(i)1 z(i)2]
+		
+		Remember that in one dimensional data, we only had z1
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%208%20Screenshots/Data%20Compression%202.png
+		
+	x(m) = R(n)
+	z(m) = R(k)
+	where k is smaller than or equal to x
+	
+
+	
+	
+	
+	
+Motivation II: Data Visualizaton:
+	
+	https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%208%20Screenshots/Data%20Visualization%201.png
+	
+	Visualizing data is helpful to troubleshoot and understand our machine learning algorithms.
+	What if we have more features than we can feasibly imagine?
+	
+	So let's say x(i) = R(50), we can use data compression to compress these values into, let's say 2 values.
+	So z(i) = R(2) vector. 
+	
+	Note: If you realize, when we use the data compression algorithm, it won't describe what our values z(1) or z(2) are.
+	
+	We can say that z(1) = Country Size/GDP
+	and z(2) = GDP per-person
