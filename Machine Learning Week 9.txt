@@ -1,0 +1,672 @@
+Machine Learning Week 9:
+
+
+
+
+
+
+
+
+Density Estimation:
+
+Problem Motivation:
+    
+    Anomaly detection is a mix of unsupervised and supervised learning algorithms.
+    
+    Example:
+        Imagine that you're a manafacturer of aircraft engines, our goal is to find anomalies
+        in our engines.
+
+        Features:
+            x(1) - Heat Generated
+            x(2) - Vibration Intensity
+        
+        Let's say we have a new engine x_test.
+
+        We want to know if this engine is anomalous.
+        We compare it to our dataset with good engines, and if it's similar then that probably means
+        it's okay. So it passed the test.
+        But if it's not similar to our dataset, like it's very far away when we plot it, it's an anomaly.
+        And maybe we send that aircraft engine back to the manafacturer.
+
+    Density Estimation:
+        https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Density%20Estimation.png
+
+        - dataset
+        - Is X_test anomalous?
+
+        We're gonna build a model for this problem, we're going to call it p(x).
+        So if p(x_test) < epsilon 
+        then that means it's an anomaly
+        otherwise, p(x_test) is completely fine.
+
+        So:
+            p(x_test) < epsilon: anomaly 
+            p(x_test) >= epsilon: ok
+
+    More Examples:
+
+        Perhaps one of the most common examples of anomaly detection is fraud detection.
+        So:
+            - x(i) = feature of user i's activities
+            - Model p(x) from data
+            - Identify unusual users by checking which have p(x) < epsilon
+
+        - Manafacturing
+        - Monitoring computers in data center
+
+    Your anomaly detection system flags x as anomalous whenever p(x) <= epsilon.
+    Suppose your system flags too many things that are not actually anomalous.
+    What should we do? We should decrease epsilon. Too many normal things are under epsilon,
+    so decreasing it will make our threshold for anomalous things more narrow. Making less 
+    anomalous assumptions.
+
+
+Gaussian Distribution:
+
+    Gaussian or Normal Distribution.
+
+    Say x = a real value. If x is a distributed Gaussian with mean u and variance sigma^2
+    We can notate this as:
+        x~n(u,sigma^2)
+        "distrubuted as"
+    
+    n means normal. This function is parameterized by u and sigma^2.
+
+    If we plot this, it will look like a bell curve.
+    The height of the plot is u which is also called the mean.
+    The length or flatness of the figure is sigma^2 which is also called the variance.
+
+    p(x; u, sigma^2)
+    Probability of x is parameterized by u and sigma^2.
+
+    p(x; u, sigma^2) formula:
+        (1/root(2pi)*sigma) * exp(-((x-u)^2)/(2sigma^2)
+
+    sigma = Standard Deviation
+    sigma squared = variance 
+    u = mean
+
+    Here are some examples of Gaussian Distribution:
+    https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Gaussian%20Distribution%20Examples.png
+
+
+    Parameter Estimation:
+
+        The Parameter Estimation problem is, let's suspect that
+        our examples x(i) were distributed with n(u, sigma^2).
+        But we don't know the values of u and sigma.
+
+        So given the our training set, we want to know what our
+        values u and sigma are.
+
+        u = (1/m) * sum(x(i)) or average of our training set
+        sigma^2 = (1/m) * sum(x(i) - u)^2 the average between the squared differences of our training examples minus
+        the mean.
+
+
+Algorithm:
+
+    Given the Gaussian Distribution formulas, we can now use it in our Anomaly Detection algorithm
+
+    Let's say we have an unlabeled training set of m examples.
+    Training set: {x(1), ... x(m)}
+    Each example: x = Rn
+
+    We're going to model P(x) after this dataset.
+    We're going to try and figure out what are
+    low probability features and high probability features.
+
+    So x is a vector. We're gonna calculate P(x) like this:
+
+    x(1) ~ N(u(1), sigma(1)^2)
+    x(2) ~ N(u(2), sigma(2)^2)
+    x(3) ~ N(u(3), sigma(3)^2)
+
+    P(x) = P(x(1); u(1), sigma(1)^2) ... * P(x(m); u(m), sigma(m)^2)
+    = product(x(j); u(j), sigma(j)^2)
+
+    This is also called the problem of density estimation.
+
+    So putting everything together, here's our ANOMALY DETECTION algorithm:
+
+        1. Choose features x(i) that you think will be indicative of anomalous examples.
+        2. Fit parameters u(1), ... ,u(j) and sigma(1)^2, ... ,sigma(j)^2
+        3. Given new examples x, compute P(x):
+            P(x) = product(x(j); u(j), sigma(j)^2)
+            Anomaly if P(x) <= epsilon
+
+
+Developing and Evaluating an Anomaly Detection System:
+	
+	The Importance of Real Number Evaluation:
+		
+		When developing a learning algorithm (Choosing features, etc),
+		making decisions is much easier if we have a way of evaluating 
+		our learning algorithm.
+	
+	In order to evaluate an ADS, we need some labeled data.
+	So far, we've only been treating ADS as an unsupervised problem.
+	If we have labeled data, we have a way to evaluate our ADS.
+	
+	So some non-anomalous examples and anomalous examples.
+	y = 0 if normal
+	y = 1 if anomalous 
+    
+	Our dataset:
+		
+		Training set: x(1), ... ,x(m)
+		Our training set will be an unlabeled training set.
+		It will contain all examples; non-anomalous and anomalous.
+		
+		Cross-validation set:(x_cv(1), y_cv(1)), ... ,(x_cv(m), y_cv(m))
+		Training set:(x_test(1), y_test(1)), ... ,(x_test(m), y_test(m))
+		
+		In the CV and test set, we will have labeled data where 
+		we know what's anomalous and what's not anomalous.
+		
+	Example:
+		
+		> 10,000 good engines (y = 0)
+		> 20 bad engines (y = 1)
+		
+		A typical split of this data will be:
+		Training set: 6000 good engines 
+			
+			We will use these examples to fit P(x) = P(x; u, sigma^2)
+		
+		CV: 2000 good engines, 10 anomalous 
+		Test: 2000 good engines, 10 anomalous 
+		
+	So:
+		
+		Fit model P(x) on training set
+		On CV set, predict from P(x)
+			Remember that the CV set is supervised.
+			So when we start testing P(x) and the value for epsilon,
+			we can see how right it is.
+		
+			Remember that the data is very skewed, an algorithm that 
+			will always predict the majority or y = 0 in this case will get 
+			a large score despite being unnaccurate.
+			Possible evaluation metrics:
+				- True positive, false positive, false negative, true negative
+					Check the fraction of these 
+				- Precision/Recall
+				- F1 -score
+					F1 = 2 * (precision * recall) / (precision + recall)
+					best score at 1
+					worst score at 0
+					
+			We can also use the CV test to evaluate our value of 
+			***epsilon***
+			
+			
+ADS vs Supervised:
+	
+	Why don't we just use a supervised learning algorithm?
+	
+	When should we use an ADS or logistic regression or even a neural network?
+	
+	Anomaly Detection:
+
+		Very small number of positive examples
+		(y = 1). (0 - 20 is common).
+		
+		Large number of negative (y = 0)
+		examples. 
+		
+		Many different types of anomalies.
+		Hard for any algorithm to learn from positive examples 
+		what the anomalies are like; future anomalies 
+		may not be like any other anomalies we've seen before.
+		
+		- Fraud Detection 
+		- Manafacturing
+		- Monitoring machines in a data center
+		
+	Supervised Learning:
+	
+		Large number of positive AND negative examples.
+		
+		Enough positive examples for the algorithm 
+		to know what positive examples are like.
+		
+		- Email spam classification
+		- Weather prediction
+		- Cancer classification
+		
+		
+Choosing what features to use:
+
+	https://www.coursera.org/learn/machine-learning/lecture/LSpXm/choosing-what-features-to-use
+	https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Non-gaussian%20features.png
+
+	We can plot our training data to see if it looks vaguely gaussian.
+	It's alright if it's not that gaussian, the algorithm will work just fine.
+	
+	However, if it's really not gaussian, we can play with the transforms
+	of the data a bit to make it look more gaussian.
+	
+	- The more guassian the data, the better the algorithm will work
+	
+	We can take a log transformation of the data so log(x)
+	It can look much more gaussian. 
+	
+	We can also do log(x+1), log(x+c) where c is some constant that we 
+	play with to make our training data more gaussian.
+	
+	Octave example:
+	
+	We can test different things on our training set with
+		hist(x) //hist(x, 50) makes it more detailed
+		
+		So we can do things like
+		hist(x^0.1, 50)
+		or 
+		hist(log(x), 50)
+		
+		To play with and visualize our training data
+		
+		once we're done, we can
+		xNew = x ... new parameters blabla
+		
+	
+	Now, how do we come up with features with an ADS?
+	
+	- Want p(x) large for normal examples
+	  Want p(x) small for anomalous examples
+	
+	Most common problem:
+		p(x) is comparable (say, both large) for normal 
+		and anomalous examples.
+		
+		- Look at what the algorithm got wrong and
+		  make new features out of that
+		  
+	Tips on choosing features:
+		
+		- Choose contrasting features 
+		
+		
+		
+Multi-variate Gaussian Distribution:
+
+	So, imagine our data isn't structured in a gaussian way.
+	What if our data grows linearly?
+	
+	We can use Multivariate gaussian/normal distribution to fix this.
+	
+	MVGD/ND:
+		
+		Don't model P(x1),P(x2),etc separately.
+		Model P(x) all in one go.
+		
+		Parameters: u = Rn, sigma = Rn*n (covariance matrix)
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Multivariate%20Gaussian%20(Normal)%20Examples%201.png
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Multivariate%20Gaussian%20(Normal)%20Examples%202.png
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Multivariate%20Gaussian%20(Normal)%20Examples%203.png
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Multivariate%20Gaussian%20(Normal)%20Examples%204.png
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Multivariate%20Gaussian%20(Normal)%20Examples%205.png
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Multivariate%20Gaussian%20(Normal)%20Examples%206.png
+		
+	
+Anomaly Detection using Multivariate Gaussian Distribution:
+		
+	https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Multivariate%20Gaussian%20Distribution.png
+	Reviewer on Multivariate Gaussian Distribution:
+		Parameters: u, sigma 
+		p(x;, u, sigma)
+		
+		Parameter Fitting:
+			Given a training set; {x(1), x(2), ... ,x(m)}
+			u = (1/m) * sum(x)
+			sigma = (1/m) * sum(x(i) - 	u)*(x(i) - u)'
+	
+	https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Anomaly%20Detection%20w%20Multivariate%20Gaussian.png
+	So heres how we put all of this together to use in our Anomaly Detection Algorithm:
+		
+		1. Fit model P(x)
+		2. Given a new example x, compute 
+			P(x) using the multivariate gaussian distribution 
+			
+			Flag an anomaly if P(x) < epsilon
+			
+	https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Multivariate%20Model%20and%20Original%20Model.png
+	Relationship to previous model:
+		
+		We can actually prove that our original model, is actually the multivariate model 
+		but with constraints. 
+		
+		So our original model's sigma corresponds to a sigma
+		where all the elements in the matrix are zeros 
+		except for the ones in the diagonal, where those elements are the 
+		original model's sigma.
+		
+	When would we use the original model vs our multivariate one though?:
+	
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Orignal%20Model%20vs%20Multivariate%20Model.png
+	
+		Note: Redundant features will make Sigma non-invertible
+		
+		
+		
+Recommender Systems:
+
+	Note: In some machine learning applications, there are algorithms that will make the features for us.
+	
+	Example:
+		
+		Predicting movie ratings
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Predicting%20Movie%20Ratings.png
+		
+		Notation:
+			n(u) = number of users 
+			n(m) = number of movies 
+			r(i, j) = 1 if user j has rated movie i
+			y(i, j) = rating given by user j to movie i
+			          (Defined only when r(i, j) = 1)
+					  
+		The problem is predicting the unknown movie ratings
+		
+Content Based Recommendations:
+	
+	Note:
+		j = user 
+		i = movie
+		so 
+		theta(j) = user
+		x(i) = movie
+	
+	This is gonna be our first approach to a recommender system,
+	predicting the ratings for movies the user hasn't seen before.
+	
+	We can say our features x1 and x2 will correspond to how "actiony" or "romancy"
+	our movies are. 
+	
+	Example:
+							x1  /x2
+		Love at last: 		0.01/0.99
+		Nonstop car chases: 0.05/1.00
+		etc...
+		
+	For each user j, learn a paramter theta(j) = Rn+1 (where n is the number of features, not counting the intercept term).
+	Predict user j as rating movie i with (theta(j))' * x(i)
+	
+	Example:
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Content%20Based%20Recommender%20Systems.png
+		
+		Let's say we want to predict theta(1)'s rating for x(r) or Alice's rating on Cute Puppies of Love.
+		So, in our case for features; x(3) will have the features
+		x(3) = [1 0.99 0] (including intercept term)
+		And our parameters for Alice of theta(1) is as follows: (We will talk more about how we got these parameters)
+		theta(1) = [0 5 0]
+		
+		So our prediction for this entry will be 
+		(theta(j))' * x(i)
+		
+		So the inner product between these two vectors is going to be 5 * 0.99
+		or 4.95.
+		
+		So our prediction for theta(1)'s rating on x(i) will be 
+		4.95
+		
+		or Alice's prediction on Cute Puppies of Love
+		
+		
+		
+	More formally, here's how we write down the problem:
+	
+		r(i, j) = 1 is user j has rated movie i (0 otherwise)
+		y(i, j) = rating by user j on movie i (if defined so r(i, j) = 1)
+		
+		theta(j) = parameter vector for user j
+		x(i) = feature vector for movie i 
+		For user j, movie i, predicted rating: (theta(j))' * x(i)
+		
+		m(j) = number of movies rated by user j
+		To learn theta(j):
+		
+			This is basically a linear regression problem so to learn theta(j) so 
+			that our predicted value will be as close possible to the values we observed 
+			in our training set.
+			
+			min theta(j) 
+			
+			First off, we sum over all the movies that user j has rated so
+			sum(i:r(i, j) = 1)
+			
+			Then we compute 
+			((theta(j))' * x(i) - y(i, j))^2
+			So the actual observed rating squared (this looks very similar to the squared error)
+			
+			Then we divide by the number of movies that the user j has actually rated so 
+			(1/2m(j))
+			
+			Note: Don't regularize w/ bias term of theta
+			reg = (lambda/2*m(j)) sum(theta(j))^2
+			If this case is true for the first sum: (i:r(i, j) = 1)
+			(1/2*m(j)) * sum((theta(j))' * x(i) - y(i, j))^2 + reg
+			
+			So from this, we get a good estimate of parameter vector theta for user j
+			to use for predicting movie ratings.
+			
+		NOTE: We can remove the parameter m(j) since it's just a constant.
+		      We only used it for this one example.
+			  
+	
+	
+	!!!!Optimization Objective (Cost Function)!!!
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Cost%20function%20for%20recommender%20systems.png
+		
+		To learn theta(j) for predicting movie ratings using (theta(j))' * x(i):
+			
+			reg = (lambda/2*m(j)) sum(theta(j))^2
+			If this case is true for the first sum: (i:r(i, j) = 1)
+			(1/2*m(j)) * sum((theta(j))' * x(i) - y(i, j))^2 + reg
+		
+		To learn all of theta(j) so theta(1), ... , theta(2):
+			
+			reg = (lambda/2*m(j)) sum(sum(theta(j)))^2
+			First sum is to sum all j 
+			Second sum is to sum all values of j if r(i, j) = 1
+			(1/2*m(j)) * sum(sum((theta(j))' * x(i) - y(i, j)))^2) + reg
+			
+	!!!Optimization Algorithm!!!
+		
+		Gradient Descent
+		alpha = learning rate 
+		k = 0 means bias term
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Gradient%20Descent%20for%20recommender%20systems.png
+		
+		This is essentially linear regression without (1/m)
+		
+		We can also use other learning algorithms but for this class,
+		we will be using gradient descent.
+		
+	
+	This is called a content based approach to recommender systems because
+	we assume we already have, available to us, features for our movies.
+	
+	However, with some movies we don't have these features.
+	In the next section, we will discuss a type of recommender system approach 
+	that will not require these features already.
+	
+	
+Collaborative Filtering:
+	
+	Collaborative filtering is used in the case where we do NOT have our features already.
+	This is a special case of machine learning where the algorithm finds the features by itself.
+	
+	Using our old dataset, suppose we don't have our features.
+	We're gonna ask our users, what type of movies do you like?
+		
+		x0 = intercept 
+		x1 = romance 
+		x2 = action
+		theta(1)/Alice = [0 5 0]
+		theta(3)/Carol = [0 0 5]
+	
+	From this, we can say that Carol likes action movies,
+	and Alice likes romance movies. From this, it becomes possible 
+	to group certain movies.
+	
+	Example:
+		
+		x0 = intercept 
+		x1 = romance 
+		x2 = action
+		theta(1)/Alice = [0 5 0]
+		theta(2)/Bob =   [0 5 0]
+		theta(3)/Carol = [0 0 5]
+		theta(4)/Dave =  [0 0 5]
+		
+		From this, we can tell that Alice and Bob love romance movies but hate action movies 
+		and Carol and Dave love action movies but hate romance movies.
+		
+		We can then get what movies they've rated before, so if they rated it high,
+		then it's probably and action movie, if they rated it low, it's probably a romance movie and so on.
+		
+		x(1) = Love at last
+		x(4) = Nonstop car chases
+		
+		So, the problem is; what values should the feature vector/movie x(1) have
+		so that:
+			
+			theta(1)' * x(1) = 5
+			theta(2)' * x(1) = 5
+			theta(3)' * x(1) = 0
+			theta(4)' * x(1) = 0
+			
+			Or, in english:
+			
+			Our formula will predict 5 for Alice's rating for the movie "Love at last",
+			5 for Bob, then 0 for Carol and Dave because according to their theta parameters,
+			they don't like romance movies.
+			
+			Maybe our new algorithm will evaluate x(1) to be 
+					x0   x1   x2
+			x(1) = [1.00 1.00 0.00]
+					bias/romance/action
+			
+			according to the user ratings.
+			
+			
+			
+	!!!Optimization Algorithm!!!
+	
+		So, let's say that our users have given us their movie preferences.
+		Given theta(1), ... , theta(n), learn x(i):
+			
+			reg = (lambda/2*m(j)) sum(sum(theta(j)))^2
+			(1/2*m(j)) * sum(sum((theta(j))' * x(i) - y(i, j)))^2) + reg
+			
+			Choose features x(i) so that our predicted value will be close
+			to the actual value.
+			
+	Collaborative Filtering:
+		
+		Given x, can estimate theta
+		Given theta, can estimate x
+		
+		We can randomly guess theta and predict movie ratings from that,
+		and from that we can guess theta then guess movie ratings.
+		We keep doing this again and again, iterating over the same process
+		for optimization.
+		
+		
+		
+		
+		
+Collaborative Filtering Algorithm:
+	
+	Collaborative Filtering Optimization Objective:
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Content%20Based%20Recommender%20Systems.png
+		
+	Collaborative Filtering Algorithm Steps:
+		
+		1. Initialize x and theta to small random values
+		2. Minimize J(x, theta) using gradient descent (or any optimization algorithm)
+		3. For a user with parameters theta and a movie with (learned) features x,
+			predict a star rating of theta'x
+			
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Collaborative%20Filtering%20Algorithm.png
+		
+		
+Vectorization: Low Rank Matrix Factorization:
+	
+	In this section, we will be talking about the vectorization of this algorithm
+	and also a little bit about the other things we can do with this algorithm.
+	For Example, given one product, we can find related products.
+	
+	First off we're gonna have some new notation in how we represent our movies and users:
+		
+		nm = number of movies so 5
+		nu = number of users so 4 
+		
+		We're gonna get all the ratings from all the users, and group them into a 
+		matrix Y which is going to be nm * nu dimensional.
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Ratings%20Matrix.png
+		
+	Vectorization:
+		
+		First off, we're gonna tranpose our movie/feature matrix x and our user/parameter matrix theta
+		so they'll be in rows. From this, we can compute our predictions as:
+			x*theta'
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%209%20Screenshots/Predicted%20ratings%20matrix.png		
+	
+	Collaborative Filtering is also called "Low rank matrix factorization"
+	
+	
+	
+	
+	
+	
+	Finding related movies:
+		
+		For each product i, we learn feature vector x(i) = Rn.
+		How to find movies j related to movie i?:
+			
+			Well, one way is to look at the euclidean distance so; ||x(i) - x(j)||
+			if that value is small, then x(i) and x(j) are "similar".
+			
+	
+	
+Implementation Detail: Mean Normalization:
+	
+	Users that have not rated any movies:
+		
+		Because of the mathematics behind our algorithm, if a user has not rated any movies,
+		our algorithm will predict zero for all the movies for this user and because of this,
+		it will also be hard to recommend movies.
+		
+		So, in order to fix this, we will use mean normalization:
+			
+			First off, we're gonna get the averages of all the movie ratings.
+			We're gonna call this matrix, "u".
+			Then we're gonna get our actual movies matrix then subtract u from that.
+			so Y - u.
+			
+			This new matrix will now have an average rating of zero.
+			
+			From this new matrix, we will use it for our collaborative filtering algorithm 
+			for this new user.
+			
+			For user j on movie i, predict theta(i)'x(i).
+			But since we subtracted u from the actual movie rating, we will add back u(i)
+			so theta(i)'x(i) + u(i)
+			
+			Also, if you think about it, this makes a lot of sense.
+			We are just adding back the average so theta(i)'x(i) + u(i)
+			for the case of a new user just means all of their ratings will be 
+			the average rating for every movie.
+			
+
+Quiz:
+	
+	https://github.com/Borye/machine-learning-coursera-1/blob/master/Week 9 Assignments/XVI. Recommender Systems - Quiz/
