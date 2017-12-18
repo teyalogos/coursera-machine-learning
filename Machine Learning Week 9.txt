@@ -670,3 +670,66 @@ Implementation Detail: Mean Normalization:
 Quiz:
 	
 	https://github.com/Borye/machine-learning-coursera-1/blob/master/Week 9 Assignments/XVI. Recommender Systems - Quiz/
+	
+
+Implementation Notes:
+	
+Anomaly Detection:
+		
+	- Apply the Algorithm
+	
+Other notes:
+	
+Anomaly Detection:
+	
+	
+	
+Content-Based Recommendations:
+	
+	We recommend content to our users by their features.
+	These can be how actiony they are, maybe how much romance they have, etc...
+	We do this by comparing the user's parameters (theta) to the movie's features (X)
+	and if the output of our prediction/comparison algorithm is high, then we should 
+	consider recommending it to the user.
+	intercept/romance/action
+	Alice = [0 5 0]
+	San Junipero = [0.00 1.00 0.05]
+	So if we use our prediction term theta'x, 
+	this will be equal to [0 5 0]
+	Because we're just multiplying the Alice's preferences with the movie's features
+	
+	So, how do we learn the parameter vector theta? Or the users preferences?
+	This is a linear regression problem.
+	
+	All we do is choose our values theta so that they are as close as possible to our training set
+	or movies the user has already watched.
+	
+	So try to get theta as close to getting 5 with theta'x
+	and the actual rating for the movie by the user is 5.
+	
+	We're optimizing our parameters theta (user preferences) based on the stuff 
+	they already prefer.
+	
+	More formally, we minimize the squared error. So basically linear regression
+	
+Collaborative Filtering:
+	
+	With collaborative filtering, we don't have the features of movie with us.
+	
+	We purely use the user's preferences to certain movies, and from that,
+	we can get the movies they like and group them and vice versa.
+	So now we can automatically gain the features for our movies.
+	
+	So, our problem is finding those movie features.
+	
+	We use linear regression to find the movie features, in the exact same way we
+	find the user's preferences.
+	
+	Because we find the movie's features based on the users preferences,
+	and the user's preferences based on the movie's features, we can keep 
+	alternating between optimizing them.
+	
+	However, a better way to do optimize them is simultaneously.
+	We use a modified version of gradient descent and the linear regression 
+	cost function for this.
+	
