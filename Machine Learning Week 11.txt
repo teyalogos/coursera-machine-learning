@@ -1,0 +1,175 @@
+Week 11
+Photo OCR
+
+Problem Description and Pipeline:
+	
+	The Photo OCR Problem:
+		The goal of this problem is to make a photo character recognition model.
+		For example, if we give the AI a picture of the face of a restaurant, it should be able 
+		to extract the name of the restaurant via character recognition from the restaurant's sign.
+		
+		Steps/Pipeline:
+			1. Detect where the characters are 
+			2. Character segmentation
+			3. Character classification
+			
+	We design a pipeline similar to the one above for machine learning problems.
+	A good way to plan a machine learning project is to break it down into a pipeline.
+	
+Sliding Windows:
+	
+	1. Text Detection 
+		Sliding Window:
+			https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%2011%20Screenshots/Text%20detection%20with%20sliding%20window.png
+		
+			We use an x * y sized rectangle to "slide" over our image.
+			Each iteration of this "sliding", we collect the image data under the rectangle.
+			- The amount the window moves is called the stride parameter
+			
+			We change our x and y size every iteration so we detect objects of different sizes.
+			
+			After we detect our objects, we will scale them up by an "expansion" operator.
+			We do this so that we can group the text together because originally they have little spaces
+			between each other.
+			
+			Since we know that tall/long groupings are probably text, we categorize those areas as text.
+			
+	2. Character Segmentation
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%2011%20Screenshots/Text%20detection%20with%20sliding%20window.png
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%2011%20Screenshots/Photo%20OCR%20pipeline.png
+		
+		1D Sliding Window for character segmentation
+		
+		We're going to slide another window over our grouped up text and retrieve 
+		more image fragments from them.
+		
+		We're going to get our these fragments and classify them as either
+			y = 1: split characters
+			y = 0: full characters
+			
+Artificial Data Synthesis:
+	
+	NOTE: A LOT OF THOUGHT, INSIGHT AND INNOVATION IS RECOMMENDED FOR DATA SYNTHESIS.
+		  USING BAD DATA CAN GIVE US BAD CLASSIFIERS.
+	
+	
+	One of the most reliable ways is to get a low bias learning algorithm and train it on 
+	a massive massive dataset. But where do we get this data from?
+	It turns out that, that in machine learning, there is this idea called "Data Synthesis".
+	
+	This doesn't apply to every single problem, and applying it to a problem tends to take some form
+	of innovation or insight. But if this idea applies to our problem, it will be an easy way to
+	make a training set for our algorithm.
+	
+	- Creating new data from scratch 
+	- Amplify our training set
+	
+	One example is for our Photo OCR problem.
+	We can synthesize millions of images containing text,
+	simulating the ones we see on photos.
+	For example, we can get a bunch of fonts and make a script 
+	that will make an image out of this font against a background
+	spelling out some word. And maybe the script will add some distortion
+	like rotation, blurring, lighting, etc to make it more realistic.
+	
+	Another example is to get our original dataset and distort it into n amount of ways 
+	with a script. Now we have n more of that example to train. This is amplifying our data.
+	
+	
+	Second example; speech recognition:
+		
+		Let's say we have a bunch of audio clips, we can distort our audio like this:
+			- Original Data
+			- Audio on bad cellphone connection 
+			- Noisy background: Crowd
+			- Noisy background: Machine
+			- Nosy background: Music
+			etc...
+		Now we just multiplied our training examples.
+		
+	Notes:
+		- Distortion should be representative of the type of noise/distortions 
+		  in the actual dataset 
+		- Usually does not help to add purely random/meaningless noise to your data.
+		
+	Discussion on more data:
+		1. Make sure you have a low bias classifier before expending the effort (Plot learning curves).
+		   E.g. keep increasing the number of features/number of hidden units in neural network
+		   you have a low bias classifier
+		
+		2. "How much work would it need to get 10x as much data as we currently have?"
+			- Artificial Data Synthesis 
+			- Collect/label it yourself
+				- Ask yourself how much time would it take to collect, let's say 10x more data?
+					How many examples per hour? 1 example per 10 seconds?
+			- "Crowd Source" data labelling 
+			
+
+			
+			
+Ceilling Analysis: What Part of the Pipeline to Work on Next:
+	
+	We're still going to use our Photo OCR problem as an example for this so:
+	
+		Image
+			
+		Text Detection 
+			
+		Character Segmentation 
+			
+		Character Recognition
+			
+			
+		What part of the pipeline should we allocate our resources to?
+		
+	Ceilling Analysis:
+		
+		Remember that it's incredibly helpful to have a single number metric for this problem so:
+			
+			We pick character level accuracy, or out of all the characters we recognized, how much 
+			did we recognize correctly?
+			
+			First off, we give the first step of the pipeline, the text detection, say 100% accuracy.
+			If we do this and see a significant improve in our system, then we should consider getting 
+			better text detection.
+			
+			Then next we're gonna do the character segmentation and so on.
+			
+			We do this for every single stage in our pipeline and check the overall accuracy.
+			Remember that it's recommended we go from the first pipeline to the last. Do not do this
+			non-linearly.
+			
+		It's called ceilling analysis because it reveals us the upper bound of how we can improve our algorithm.
+		Debug modularily!!
+		
+		Another Ceilling Analysis Example:
+			
+			Face recognition (arificial example)
+			
+			1. Preprocess (remove background)
+			2. Face detection
+				- Eyes segmentation
+				- Nose segmentation
+				- Mouth segmentation
+			3. Logistic regression
+			4. Label
+			
+			(Every percentage of each item in the pipeline means the overall percentage of the system
+			 if that item were perfect or were 100%)
+			Overall system: 85%
+			Preprocess: 85.1% //So maybe this isn't much needed
+			Face detection: 91%
+			Eyes segmentation: 95%
+			Nose segmentation: 96%
+			Mouth segmentation 97%
+			Logistic Regression: 100%
+			
+			So it looks like that the items that are worth our time are the face detection,
+			eye detection and logistic regression items.
+			
+SUMMARY:
+	- Evaluation of learning algorithms 
+		- Learning curves 
+		- Error analysis 
+		- Ceilling analysis
+			
