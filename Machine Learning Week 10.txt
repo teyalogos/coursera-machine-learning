@@ -1,0 +1,209 @@
+Week 10
+
+Learning With Large Datasets:
+	
+	https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%2010%20Screenshots/Learning%20with%20large%20datasets.png
+	
+	We already know that training a low-bias learning algorithm
+	with a lot of data does really well.
+	
+	"It's not who has the best algorithm that wins. It's who has the most data."
+	
+	Learning with large datasets comes with it's own problems,
+	more specifically; computational problems.
+	
+		Let's say our training set is M = 100,000,000
+		Now, with gradient descent, one of the steps to gradient descent is the summation.
+		Obviously, summing up 100,000,000 examples is computationally expensive so we might want to
+		use other techniques for optimizing our model.
+		
+		One technique is to use subsets of examples, like maybe for each iteration
+		we will use 1000 randomly picked examples.
+		
+		But first off, we need to check if using a subset of 1000 examples is good enough.
+		One way to check is to plot a learning curve where error is the y axis and m is the x axis.
+			- Learning Curve
+			
+			
+			
+			
+Stochastic Gradient Descent:
+	
+	Note: We're gonna use linear regression as an example throughout this section
+	
+	Now, recall that the linear regression cost function is as follows:
+		
+		h(x) = sum(theta*x)
+		
+		J_train(theta) = (1/(2*m)) * sum(h(x) - y) ^ 2
+		
+	And gradient descent for linear regression is as follows:
+		
+		theta(j) = theta(j) - a * (1/m) * sum(h(x) - y) * x
+		
+		for every(j = 0, ... ,n)
+		
+	Now, the problem of gradient descent is that if m is large (let's say 300,000,000), 
+	summing over all of the examples is computationally expensive.
+	
+	Summing over ALL of the examples is called batch gradient descent,
+	because we're summing over the entire batch of examples.
+	
+	This version of gradient descent isn't that good so we might want to use another version 
+	of GD. We're going to use stochastic gradient descent:
+		
+		cost(theta, (x(i), y(i)) = (1/2) * (h(x(i)) - y(i)) ^ 2
+		This cost function calculates the cost of one example.
+		
+		J_train(theta) = (1/m) * sum(cost(theta, (x(i), y(i))))
+		
+	Steps of stochastic gradient descent:
+		
+		1. Randomly Shuffle Dataset
+		2. Repeat {
+			for i=1:m
+			{
+				theta(j) = theta(j) - a * (h(x(i)) - y(i)) * x(i)j
+			}
+			Do for all values of j
+		
+	Stochastic gradient descent iterates through a random example at a time,
+	because of this, we are constantly trying to fit our parameters to that example.
+	If we plot it's progress, what we see is a more random, more chaotic path to the global minimum
+	because it changes it's parameters differently according to each training example.
+	While batch gradient descent is a much more linear path to the global minimum.
+	
+	Now, with batch gradient descent, it's more likely to reach the global minimum because 
+	it's using all of the training examples, however it is much slower. With stochastic gradient descent,
+	because we're using a random training example at each iteration, it will wander around the 
+	global minimum and will almost never reach it. However this isn't much of a problem considering how big 
+	the dataset is. It'll be a good enough hypothesis.
+	
+	We repeat our inner loop maybe once or ten times. It really depends on how big our dataset is.
+	
+	
+Mini-Batch Gradient Descent:
+	
+	MBGD uses b examples a time.
+	b = minibatch size
+	
+	Example:
+		
+		Get b = 10 examples (x(i), y(i)), ... , (x(i+9), y(i+9))
+		
+		theta(j) = theta(j) - alpha * (1/10) * (i+9, k = i)sum(h(x(k)) - y(k)) * x(k)j
+		
+		
+Stochastic Gradient Descent Convergence:
+	
+	During learning, compute cost(theta, (x(i), y(i))) before updating theta using (x(i), y(i))
+	
+	Every 1000 iterations (say), plot cost averaged over the last 1000 examples processed by algorithm.
+	
+	Notes:
+		Using more iterations like 5000 (say) might give us a clearer learning curve,
+		making us see trends more clearly since noise is common when using a smaller amount of iterations.
+		
+	Recall that SGD wanders around the minimum.
+	In most implementations of SGD, the learning rate alpha is typically a constant.
+	If we want SGD to converge to the global minimum, we can update alpha overtime.
+	We can do this by:
+		a = (const1/iterationNumber + const2)
+	
+	We don't normally do this because we have to play around with the parameters const1 and const2
+		
+		
+Online Learning Setting:
+	
+	This is a large-machine-learning setting where we constantly have data flood to us.
+	
+	Let's say we are an online retailer service.
+	When people get their items shipped from point a to point b, we offer them a price 
+	and a shipping service.
+		
+		- Users choose our shipping service y = 1
+		- Users don't choose our shipping service y = 0
+	
+	We want to increase our revenue by optimizing the price of our shipping service
+	so that people use it.	
+	
+	Let's say we capture the user's features, like their demographics (their destination and origin).
+	
+	We want to learn P(y = 1|x;theta) to optimize price.
+	Note: our features also contain the current price
+	
+	For this problem, we will be using logistic regression. We can use other algorithms such as a perceptron neural net.
+	
+	Repeat Forever:
+		
+			For each user that comes, get (x, y) corresponding to that user.
+			Update theta using (x, y)
+				Using gradient descent, we discard the summation symbol.
+				We get rid of a constant dataset so we update and discard
+				the training example as gradient descent does it's job.
+				
+				So we update theta using (x, y) comes
+				then we discard it afterwards
+				
+	This algorithm also adapts to user preferences.
+
+	
+
+Map-reduce and data parallelism:
+
+	Now, some machine learning problems are too big to run on one machine.
+	We use map-reduce and data parallelism to face this problem.
+	
+	Map-reduce:
+		Batch Gradient Descent:
+			Let's say m = 400
+			We're gonna split this training set in parellel.
+			//One indexed
+			Machine 1 will use (x(1), y(1)), ... , (x(100), y(100))
+			temp_1(j) = gradient descent from this machine
+			Machine 2 will use (x(101), y(101)), ... , (x(200), y(200))
+			temp_2(j) = gradient descent from this machine
+			Machine 3 will use (x(201), y(201)), ... , (x(300), y(300))
+			temp_3(j) = gradient descent from this machine
+			Machine 4 will use (x(301), y(301)), ... , (x(400), y(400))
+			temp_4(j) = gradient descent from this machine
+			
+			We're gonna get all the temp values from the machines and combine them through a master server:
+				theta(j) = theta(j) - alpha * (1/m) * sum(temp)
+				We sum up all the temp values (temp_1(j) + temp_2(j) + temp_3(j) + temp_4(j))
+	
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%2010%20Screenshots/Batch%20Gradient%20Descent%20w%20Map-reduce.png
+		
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%2010%20Screenshots/Map-Reduce.png
+	
+	Map-reduce and summation over the training set:
+		
+		> Can your learning algorithm be expressed as a summation over the training set?
+		It turns out that many learning algorithms can actually be expressed like this.
+		Wherever we can do this, map-reduce might be a good candidate for scaling our learning algorithms 
+		to very big datasets.
+		
+	Multi-core machines:
+		
+		TensorFlow does the map-reduce automatically.
+		https://github.com/Oboark/coursera-machine-learning/blob/master/Notes/Week%2010%20Screenshots/Multi-core%20machines.png
+	
+		
+Other Notes:
+	
+	- Batch gradient descent uses all m examples at a time
+	- Stochastic gradient descent only uses 1 example at a time 
+	- Mini batch gradient descent uses b examples at a time
+	
+	- Map-reduce is done automatically with TensorFlow and other ML libraries
+	
+	SGD vs MGBD:
+		
+		MGBD will likely to outperform SGD if your vectorized implementation is good.
+		
+	Checking for Convergence:
+		
+		BGD:
+			- Plot J_train(theta) as a function of the number of iterations of gradient descent.
+		SGD:
+			Section on Stochastic Gradient Descent Convergence
